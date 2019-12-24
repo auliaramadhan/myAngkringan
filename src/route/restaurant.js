@@ -60,3 +60,5 @@ router.put('/changerestaurant/:id', auth, upload.single("image"), (req, res)=>{
    mysql.execute(sql, [name, x, y, image, desc], sqlexec)
 
 })
+
+module.exports = router
