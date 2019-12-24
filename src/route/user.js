@@ -4,6 +4,8 @@ const JWT = require('jsonwebtoken');
 const bcrypt = require('bcryptjs')
 const mysql = require('../dbconfig')
 const {auth} = require('../middleware/auth')
+const {sqlexec} = require('../middleware/mysql');
+
 
 
 router.post('/registrasi', (req,res) =>{
@@ -13,9 +15,7 @@ router.post('/registrasi', (req,res) =>{
 
    const sql = "INSERT INTO user (username,password) VALUES(?,?)"
 
-   mysql.execute(sql,[username, enc_pass], (err, result, field)=>{
-      res.send(result)
-   })
+   mysql.execute(sql,[username, enc_pass], sqlexec)
 
 })
 
@@ -31,9 +31,7 @@ router.post('/createmanager',auth,(req,res) =>{
 
    const sql = "INSERT INTO user (username,password,roles,id_restaurant) VALUES(?,?,?,?)"
 
-   mysql.execute(sql,[username, enc_pass,"manager", id_restaurant ], (err, result, field)=>{
-      res.send(result)
-   })
+   mysql.execute(sql,[username, enc_pass,"manager", id_restaurant ],sqlexec)
 
 })
 
@@ -43,10 +41,7 @@ router.put('/changeuser/:username', auth, (req, res) => {
    const {username} = req.user
    const sql = 'UPDATE user SET password=? where username=?'
 
-   mysql.execute(sql, [password, username], (err, result,field) =>{
-      console.log(err)
-      res.send(field)
-   })
+   mysql.execute(sql, [password, username], sqlexec)
 })
 
 router.put('/changeroles/:username', auth, (req, res) => {
@@ -59,7 +54,7 @@ if (req.user.roles !== "admin") {
     const {username} = req.user
    const sql = 'UPDATE user SET roles=? WHERE username=?'
    mysql.execute(sql, [roles, username], (err, result,field) =>{
-      console.log(err)
+      if (err) console.log(err)
       res.send(field)
    })
 })

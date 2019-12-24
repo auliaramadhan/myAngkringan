@@ -17,8 +17,17 @@ var storage = multer.diskStorage({
 });
 var upload = multer({ storage: storage });
 
-router.get("/", (req, res) => {
-  const { id_restaurant } = req.query;
+router.get("/", (req, res) => { 
+   const query = "SELECT * FROM item JOIN restauran where item.id_restaurant=restaurant.id";
+ 
+   mysql.execute(sql, [id_restaurant], (err, result, field) => {
+     res.send(field);
+   });
+ });
+ 
+
+router.get("/:id_restaurant", (req, res) => {
+  const { id_restaurant } = req.params;
 
   const query = "SELECT * FROM item WHERE id_restaurant=?";
 
@@ -28,7 +37,7 @@ router.get("/", (req, res) => {
 });
 
 router.post("/additem", auth, upload.single("image"), (req, res) => {
-  const image = "public/images/uploads/" + req.file.filename;
+  const image = "public/images/uploads/item/" + req.file.filename;
   if (req.user !== "manager") {
     res.send({ success: false, msg: "we siapa lu" });
     fs.unlink(image, err => {
@@ -40,7 +49,7 @@ router.post("/additem", auth, upload.single("image"), (req, res) => {
   const [id_restaurant] = req.user
   const { name, price } = req.body;
 
-  const query =
+  const sql =
     "INSERT INTO item (name, price, image, id_restaurant) VALUES (?,?,?,?)";
 
   mysql.execute(
@@ -53,7 +62,7 @@ router.post("/additem", auth, upload.single("image"), (req, res) => {
 });
 
 router.put("/changeitem/:id", auth, upload.single("image"), (req, res) => {
-   const image = "public/images/uploads/" + req.file.filename;
+   const image = "public/images/uploads/item/" + req.file.filename;
    if (req.user !== "manager") {
      res.send({ success: false, msg: "we siapa lu" });
      fs.unlink(image, err => {
@@ -95,3 +104,5 @@ router.delete("/removeitem", auth, (req, res) => {
     res.send(result);
   });
 });
+
+module.exports = router;
