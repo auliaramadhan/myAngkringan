@@ -5,6 +5,8 @@ const bcrypt = require("bcryptjs");
 const mysql = require("../dbconfig");
 const fs = require("fs");
 const { auth } = require("../middleware/auth");
+const {sqlexec} = require('../middleware/mysql');
+
 
 var multer = require("multer");
 var storage = multer.diskStorage({
@@ -20,9 +22,7 @@ var upload = multer({ storage: storage });
 router.get("/", (req, res) => { 
    const query = "SELECT * FROM item JOIN restauran where item.id_restaurant=restaurant.id";
  
-   mysql.execute(sql, [id_restaurant], (err, result, field) => {
-     res.send(field);
-   });
+   mysql.execute(sql, [id_restaurant], sqlexec);
  });
  
 
@@ -31,9 +31,7 @@ router.get("/:id_restaurant", (req, res) => {
 
   const query = "SELECT * FROM item WHERE id_restaurant=?";
 
-  mysql.execute(sql, [id_restaurant], (err, result, field) => {
-    res.send(field);
-  });
+  mysql.execute(sql, [id_restaurant], sqlexec);
 });
 
 router.post("/additem", auth, upload.single("image"), (req, res) => {
@@ -52,13 +50,7 @@ router.post("/additem", auth, upload.single("image"), (req, res) => {
   const sql =
     "INSERT INTO item (name, price, image, id_restaurant) VALUES (?,?,?,?)";
 
-  mysql.execute(
-    sql,
-    [name, price, image, id_restaurant],
-    (err, result, field) => {
-      res.send(field);
-    }
-  );
+  mysql.execute(sql,[name, price, image, id_restaurant],sqlexec);
 });
 
 router.put("/changeitem/:id", auth, upload.single("image"), (req, res) => {
@@ -82,13 +74,7 @@ router.put("/changeitem/:id", auth, upload.single("image"), (req, res) => {
    const query =
      "UPDATE item SET name=?, price=?, image=? WHERE id=?";
 
-   mysql.execute(
-     sql,
-     [name, price, image, id],
-     (err, result, field) => {
-       res.send(field);
-     }
-   );
+   mysql.execute(sql,[name, price, image, id],sqlexec);
  });
 
 router.delete("/removeitem", auth, (req, res) => {
@@ -99,10 +85,7 @@ router.delete("/removeitem", auth, (req, res) => {
   const { id } = req.body;
   const sql = `DELETE item WHERE id=?`;
 
-  mysql.execute(sql, [id], (err, result, field) => {
-    console.log(err);
-    res.send(result);
-  });
+  mysql.execute(sql, [id],sqlexec);
 });
 
 module.exports = router;
