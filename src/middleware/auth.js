@@ -19,3 +19,5 @@ function auth(req, res, next) {
     res.send({ success: false, msg: "must login first" });
   }
 }
+
+module.exports = {auth}

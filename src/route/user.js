@@ -3,10 +3,10 @@ const router = require('express').Router()
 const JWT = require('jsonwebtoken');
 const bcrypt = require('bcryptjs')
 const mysql = require('../dbconfig')
-const {auth} = require('../middleware')
+const {auth} = require('../middleware/auth')
 
 
-router.post('/', auth, (req,res) =>{
+router.post('/registrasi', (req,res) =>{
    const {username, password} = req.body
 
    const enc_pass = bcrypt.hashSync(password)
@@ -47,12 +47,12 @@ router.post('/login', (req,res) => {
 
 })
 
-router.get('/:id',auth, (req,res)=>{
-   const {id} = req.params
-   const sql = 'SELECT * FROM user where id=?'
-   mysql.execute(sql,[id],(err, result, field) => {
-      res.send(result)
-   })
-})
+// router.get('/:id',auth, (req,res)=>{
+//    const {id} = req.params
+//    const sql = 'SELECT * FROM user where id=?'
+//    mysql.execute(sql,[id],(err, result, field) => {
+//       res.send(result)
+//    })
+// })
 
 module.exports = router
