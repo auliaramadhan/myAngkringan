@@ -21,9 +21,9 @@ var storage = multer.diskStorage({
 var upload = multer({ storage: storage });
 
 router.get("/", (req, res) => {
-  const query = "SELECT * FROM restaurant";
 
-  mysql.execute(sql, [id_restaurant], sqlexec(res,mysql));
+  const query = "SELECT * FROM restaurant ";
+  mysql.execute(sql, [], sqlexec(res,mysql));
 });
 
 router.post('/addrestaurant', auth, upload.single("image") ,(req,res) => {
