@@ -23,7 +23,7 @@ var upload = multer({ storage: storage });
 router.get("/", (req, res) => {
   const query = "SELECT * FROM restaurant";
 
-  mysql.execute(sql, [id_restaurant], sqlexec);
+  mysql.execute(sql, [id_restaurant], sqlexec(res,mysql));
 });
 
 router.post('/addrestaurant', auth, upload.single("image") ,(req,res) => {
@@ -38,9 +38,9 @@ router.post('/addrestaurant', auth, upload.single("image") ,(req,res) => {
    }
    const {name, x, y, desc} = req.body
 
-   const sql ="INSERT INTO item (name, x, y, image, desc) VALUES (?,?,?,?,?)";
+   const sql ="INSERT INTO item (name,longitude, latitude, image, desc) VALUES (?,?,?,?,?)";
 
-   mysql.execute(sql, [name, x, y, image, desc], sqlexec)
+   mysql.execute(sql, [name, x, y, image, desc], sqlexec(res,mysql))
 })
 
 router.put('/changerestaurant/:id', auth, upload.single("image"), (req, res)=>{
@@ -53,11 +53,13 @@ router.put('/changerestaurant/:id', auth, upload.single("image"), (req, res)=>{
     });
     return;
    }
+
    const {name, x, y, desc} = req.body
+   const {id} = req.params
 
-   const sql = "SESUATAU"
+   const sql = "UPDATE restaurant SET name=? ,longitude=?, latitude=?, logo=?,description=? WHERE id=?"
 
-   mysql.execute(sql, [name, x, y, image, desc], sqlexec)
+   mysql.execute(sql, [name, x, y, image, desc, id], sqlexec(res,mysql))
 
 })
 

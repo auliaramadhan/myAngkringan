@@ -1,12 +1,12 @@
 const router = require("express").Router();
 const mysql = require("../dbconfig");
 const { auth } = require("../middleware/auth");
-const { sqlexec } = require("../middleware/mysql");
+const { sqlexec} = require("../middleware/mysql");
 
 router.get('/', auth, (req, res) => {
    const {id} = req.user
    const sql = "SELECT * FROM cart JOIN item where cart.id_item=item.id AND cart.id_user=?"
-   mysql.execute(sql,[id], sqlexec)
+   mysql.execute(sql,[id], sqlexec(res,mysql))
 })
 
 router.post('/putitemtocart', auth, (req,res) =>{
@@ -18,7 +18,7 @@ router.post('/putitemtocart', auth, (req,res) =>{
 
    const sql = "INSERT INTO cart (id_user, id_item,qty) VALUES (?,?,?)"
 
-   mysql.execute(sql, [id_user, id_item, qty], sqlexec)
+   mysql.execute(sql, [id_user, id_item, qty], sqlexec(res,mysql))
 
 })
 
@@ -32,5 +32,7 @@ router.delete('/removefromcart/:id', auth, (req,res) =>{
 
    const sql = "DELETE cart where id=?"
 
-   mysql.execute(sql, [id_user, id_item, qty], sqlexec)
+   mysql.execute(sql, [id_user, id_item, qty], sqlexec(res,mysql))
 })
+
+module.exports = router

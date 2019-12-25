@@ -15,7 +15,7 @@ router.post('/registrasi', (req,res) =>{
 
    const sql = "INSERT INTO user (username,password) VALUES(?,?)"
 
-   mysql.execute(sql,[username, enc_pass], sqlexec)
+   mysql.execute(sql,[username, enc_pass], sqlexec(res,mysql))
 
 })
 
@@ -31,8 +31,7 @@ router.post('/createmanager',auth,(req,res) =>{
 
    const sql = "INSERT INTO user (username,password,roles,id_restaurant) VALUES(?,?,?,?)"
 
-   mysql.execute(sql,[username, enc_pass,"manager", id_restaurant ],sqlexec)
-
+   mysql.execute(sql,[username, enc_pass,"manager", id_restaurant ],sqlexec(res,mysql))
 })
 
 router.put('/changeuser/:username', auth, (req, res) => {
@@ -41,7 +40,7 @@ router.put('/changeuser/:username', auth, (req, res) => {
    const {username} = req.user
    const sql = 'UPDATE user SET password=? where username=?'
 
-   mysql.execute(sql, [password, username], sqlexec)
+   mysql.execute(sql, [password, username], sqlexec(res,mysql))
 })
 
 router.put('/changeroles/:username', auth, (req, res) => {
@@ -61,6 +60,7 @@ if (req.user.roles !== "admin") {
 
 router.post('/login', (req,res) => {
    const {username, password} = req.body
+   console.log(req.body)
    const sql = 'SELECT * FROM user where username=?'
    mysql.execute(sql, [username], (err, result, field)=>{
       console.log(result)

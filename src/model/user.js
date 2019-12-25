@@ -4,7 +4,7 @@ const JWT = require('jsonwebtoken');
 const bcrypt = require('bcryptjs')
 const mysql = require('../dbconfig')
 const {auth} = require('../middleware/auth')
-const {sqlexec} = require('../middleware/mysql');
+// const {sqlexec(res,mysql)} = require('../middleware/mysql');
 
 
 router.post('/registrasi', auth, (req,res) =>{
@@ -14,7 +14,7 @@ router.post('/registrasi', auth, (req,res) =>{
 
    const sql = "INSERT INTO user (username,password) VALUES(?,?)"
 
-   mysql.execute(sql,[username, enc_pass], sqlexec)
+   mysql.execute(sql,[username, enc_pass], sqlexec(res,mysql))
 })
 
 router.post('/login', (req,res) => {

@@ -2,6 +2,7 @@ require('dotenv').config();
 const jwt = require("jsonwebtoken");
 
 function auth(req, res, next) {
+  // console.log(req.headers['authorization'])
   if (
     req.headers["authorization"] &&
     req.headers["authorization"].startsWith("Bearer")
@@ -15,8 +16,9 @@ function auth(req, res, next) {
       console.log(err);
       res.send({ success: false, msg: "jwt invalid" });
     }
-
+  }else{
     res.send({ success: false, msg: "must login first" });
+
   }
 }
 
