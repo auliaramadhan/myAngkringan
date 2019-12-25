@@ -20,7 +20,10 @@ var upload = multer({ storage: storage });
 
 router.get("/", (req, res) => {
   const sql =
-    "SELECT * FROM item JOIN restauran where item.id_restaurant=restaurant.id";
+    `SELECT (item.id,item.name, item.price, item.image, item.rating, 
+      item.created_on, item.updated_on, restaurant.name) 
+    FROM item JOIN restauran WHERE item.id_restaurant=restaurant.id 
+    ORDER BY restauran.id`;
 
   mysql.execute(sql, [id_restaurant], sqlexec(res,mysql));
 });

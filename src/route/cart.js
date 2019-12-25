@@ -5,7 +5,8 @@ const { sqlexec} = require("../middleware/mysql");
 
 router.get('/', auth, (req, res) => {
    const {id} = req.user
-   const sql = "SELECT * FROM cart JOIN item where cart.id_item=item.id AND cart.id_user=?"
+   const sql = `SELECT (cart.id, item.name, item.price, item.image, item.rating)
+    FROM cart JOIN item on cart.id_item=item.id WHERE cart.id_user=?`
    mysql.execute(sql,[id], sqlexec(res,mysql))
 })
 

@@ -7,7 +7,7 @@ function sqlexec(res, mysql) {
         else res.send({ success: false, msg: "error in database" });
         mysql.close();
       } else {
-        res.send(result);
+        res.send({success: true, data:result});
         console.log(field);
       }
     } catch (error) {
