@@ -1,4 +1,4 @@
-require('dotenv').config();
+require("dotenv").config();
 const jwt = require("jsonwebtoken");
 
 function auth(req, res, next) {
@@ -16,10 +16,9 @@ function auth(req, res, next) {
       console.log(err);
       res.send({ success: false, msg: "jwt invalid" });
     }
-  }else{
+  } else {
     res.send({ success: false, msg: "must login first" });
-
   }
 }
 
-module.exports = {auth}
+module.exports = { auth };
