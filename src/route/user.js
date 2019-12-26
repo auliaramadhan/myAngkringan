@@ -11,9 +11,9 @@ router.post("/registrasi", (req, res) => {
 
   const enc_pass = bcrypt.hashSync(password);
 
-  const sql = "INSERT INTO user (username,password) VALUES(?,?)";
+  const sql = "INSERT INTO user (username,password,roles) VALUES(?,?,?)";
 
-  mysql.execute(sql, [username, enc_pass], sqlexec(res, mysql));
+  mysql.execute(sql, [username, enc_pass, 'customer'], sqlexec(res, mysql));
 });
 
 router.post("/createmanager", auth, (req, res) => {
@@ -39,6 +39,10 @@ router.put("/changeuser/:username", auth, (req, res) => {
   const { password } = req.body;
   // const {username} = req.params
   const { username } = req.user;
+  if (req.params.username !== username){
+    res.send({ success: false, msg: "authorization invalid" });
+    return;
+  }
   const sql = "UPDATE user SET password=? where username=?";
 
   mysql.execute(sql, [password, username], sqlexec(res, mysql));
@@ -53,7 +57,8 @@ router.put("/changeroles/:username", auth, (req, res) => {
 //   const username = req.params.username;
   
   const { roles } = req.body;
-   const {username} = req.params;
+  //  const {username} = req.params;
+   const {username} = req.user;
   const sql = "UPDATE user SET roles=? WHERE username=?";
   mysql.execute(sql, [roles, username], sqlexec(res, mysql));
 });
@@ -66,7 +71,8 @@ router.post("/login", (req, res) => {
     console.log(result);
     if (result.length > 0) {
       if (bcrypt.compareSync(password, result[0].password)) {
-        const auth = JWT.sign({ ...result[0], id: null }, process.env.APP_KEY);
+        // const auth = JWT.sign({ ...result[0], id: null }, process.env.APP_KEY);
+        const auth = JWT.sign({ ...result[0] }, process.env.APP_KEY);
         res.send({
           success: true,
           auth

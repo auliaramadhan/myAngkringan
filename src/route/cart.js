@@ -5,16 +5,18 @@ const { sqlexec } = require("../middleware/mysql");
 
 router.get("/", auth, (req, res) => {
   const { id } = req.user;
-  const sql = `SELECT (cart.id, item.name, item.price, item.image, item.rating)
+  const sql = `SELECT cart.id, item.name, item.price, item.image, item.rating, cart.qty
     FROM cart JOIN item on cart.id_item=item.id WHERE cart.id_user=?`;
+    console.log(req.user)
   mysql.execute(sql, [id], sqlexec(res, mysql));
 });
 
 router.post("/putitemtocart", auth, (req, res) => {
   if (req.user.roles !== "customer") {
-    re.send({ success: false, msg: "langsung ambil aja di toko" });
+    res.send({ success: false, msg: "langsung ambil aja di toko" });
   }
   const id_user = req.user.id;
+  console.log(req.user)
   const { id_item, qty } = req.body;
 
   const sql = "INSERT INTO cart (id_user, id_item,qty) VALUES (?,?,?)";
@@ -24,7 +26,7 @@ router.post("/putitemtocart", auth, (req, res) => {
 
 router.put("/changeitemqty/:id", auth, (req, res) => {
   if (req.user.roles !== "customer") {
-    re.send({ success: false, msg: "langsung ambil aja di toko" });
+    res.send({ success: false, msg: "langsung ambil aja di toko" });
   }
   const id_user = req.user.id;
   const id = req.params.id;
@@ -37,13 +39,13 @@ router.put("/changeitemqty/:id", auth, (req, res) => {
 
 router.delete("/removefromcart/:id", auth, (req, res) => {
   if (req.user.roles !== "customer") {
-    re.send({ success: false, msg: "langsung ambil aja di toko" });
+    res.send({ success: false, msg: "langsung ambil aja di toko" });
   }
   const id = req.params.id;
+  const id_user = req.user.id;
+  const sql = "DELETE FROM cart where id=? AND id_user=?";
 
-  const sql = "DELETE cart where id=?";
-
-  mysql.execute(sql, [id], sqlexec(res, mysql));
+  mysql.execute(sql, [id,id_user], sqlexec(res, mysql));
 });
 
 module.exports = router;

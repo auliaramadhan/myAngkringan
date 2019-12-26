@@ -32,7 +32,8 @@ router.post("/addreview/:id_item", auth, (req, res) => {
   }
   const id_user = req.user.id;
   const { id_item } = req.params;
-  const { review, rating } = req.params;
+  const { review, rating } = req.body;
+  console.log([review, rating, id_item, id_user])
 
   const sql = `INSERT INTO review (review, rating,id_item,id_user)
    VALUES (?,?,?,?)`;
@@ -51,7 +52,7 @@ router.put("/changereview/:id_item", auth, (req, res) => {
   }
   const id_user = req.user.id;
   const { id_item } = req.params;
-  const { review, rating } = req.params;
+  const { review, rating } = req.body;
 
   const sql = `UPDATE review SET review=?, rating=? where id_item=? AND id_user=?`;
 
