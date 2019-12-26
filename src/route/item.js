@@ -40,7 +40,7 @@ router.get("/search", (req, res) => {
   console.log(req.query)
   name = name ? ` item.name LIKE "%${name}%" ` : `item.name LIKE "%%"`;
   price = price ? ` item.price= "${price}"` : "";
-  rating = rating ?  ` item.rating="${rating}" ` : "";
+  rating = rating ?  ` item.rating=ROUND(rating,0) ` : "";
   order = order ? "item." + order : "restaurant.id";
   const AND = condition => (condition ? "AND" : "");
   let where = name || price || rating ? "WHERE" : "";
@@ -74,46 +74,22 @@ router.get("/:id_restaurant", (req, res) => {
 });
 
 
-router.post("/additem", auth, upload.single("image"), (req, res) => {
-  
+router.post("/additem", auth('manager'), upload.single("image"), (req, res) => {
   const image = dir + req.file.filename +".jpg";
-  if (req.user.roles !== "manager") {
-    res.send({ success: false, msg: "we siapa lu" });
-    fs.unlink(image, err => {
-      if (err) throw err;
-      console.log("successfully deleted " + image);
-    });
-    return;
-  }
   const {id_restaurant} = req.user;
-  const { name, price, rating } = req.body;
+  const { name, price } = req.body;
   
-
-
-
   const sql =
-    "INSERT INTO item (name, price, image, id_restaurant,rating) VALUES (?,?,?,?)";
+    "INSERT INTO item (name, price, image, id_restaurant) VALUES (?,?,?,?)";
 
-  mysql.execute(sql, [name, price, image, id_restaurant, rating], sqlexec(res, mysql));
+  mysql.execute(sql, [name, price, image, id_restaurant], sqlexec(res, mysql));
 });
 
-router.put("/changeitem/:id", auth, upload.single("image"), (req, res) => {
-  console.log(req.file)
+router.put("/changeitem/:id", auth('manager'), upload.single("image"), (req, res) => {
   const image = dir + req.file.filename;
-  console.log(image)
-  if (req.user.roles !== "manager") {
-    res.send({ success: false, msg: "we siapa lu" });
-    fs.unlink(image, err => {
-      if (err) throw err;
-      console.log("successfully deleted " + image);
-    });
-    return;
-  }
-
   /*nanti ditambah buat gambar lama
 
    */
-
   const {id}= req.params;
   const { name, price } = req.body;
 
@@ -122,12 +98,7 @@ router.put("/changeitem/:id", auth, upload.single("image"), (req, res) => {
   mysql.execute(sql, [name, price, image, id], sqlexec(res, mysql));
 });
 
-router.delete("/removeitem/:id", auth, (req, res) => {
-  if (req.user.roles !== "manager") {
-    res.send({ success: false, msg: "we siapa lu" });
-    return;
-  }
-
+router.delete("/removeitem/:id", auth('manager'), (req, res) => {
   const {id_restaurant}  = req.user;
   const {id}  = req.params;
   const sql = `DELETE FROM item WHERE id=? AND id_restaurant=?`;

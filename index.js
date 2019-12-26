@@ -8,6 +8,7 @@ const express = require("express"),
   restaurant = require("./src/route/restaurant"),
   item = require("./src/route/item"),
   review = require("./src/route/review"),
+  category = require("./src/route/category"),
   multer = require("multer"),
   upload = multer(),
   cart = require("./src/route/cart");
@@ -27,6 +28,7 @@ app.use("/cart", cart);
 app.use("/restaurant", restaurant);
 app.use("/item", item);
 app.use("/review", review);
+app.use("/category", category);
 
 app.get("/", (req, res) => {
   res.send("helo");

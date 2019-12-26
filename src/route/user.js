@@ -3,28 +3,20 @@ const router = require("express").Router();
 const JWT = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const mysql = require("../dbconfig");
-const { auth } = require("../middleware/auth");
+const { auth , logout} = require("../middleware/auth");
 const { sqlexec } = require("../middleware/mysql");
 
 router.post("/registrasi", (req, res) => {
   const { username, password } = req.body;
-
   const enc_pass = bcrypt.hashSync(password);
-
   const sql = "INSERT INTO user (username,password,roles) VALUES(?,?,?)";
 
   mysql.execute(sql, [username, enc_pass, 'customer'], sqlexec(res, mysql));
 });
 
-router.post("/createmanager", auth, (req, res) => {
-  if (req.user.roles !== "admin") {
-    res.send({ success: false, msg: "authorization invalid" });
-    return;
-  }
+router.post("/createmanager", auth('admin'), (req, res) => {
   const { username, password, id_restaurant } = req.body;
-
   const enc_pass = bcrypt.hashSync(password);
-
   const sql =
     "INSERT INTO user (username,password,roles,id_restaurant) VALUES(?,?,?,?)";
 
@@ -35,9 +27,9 @@ router.post("/createmanager", auth, (req, res) => {
   );
 });
 
-router.put("/changeuser/:username", auth, (req, res) => {
+
+router.put("/changeuser/:username", auth() , (req, res) => {
   const { password } = req.body;
-  // const {username} = req.params
   const { username } = req.user;
   if (req.params.username !== username){
     res.send({ success: false, msg: "authorization invalid" });
@@ -48,17 +40,9 @@ router.put("/changeuser/:username", auth, (req, res) => {
   mysql.execute(sql, [password, username], sqlexec(res, mysql));
 });
 
-router.put("/changeroles/:username", auth, (req, res) => {
-
-  if (req.user.roles !== "admin") {
-    res.send({ success: false, msg: "authorization invalid" });
-    return;
-  }
-//   const username = req.params.username;
-  
+router.put("/changeroles/:username", auth('admin'), (req, res) => {
   const { roles } = req.body;
-  //  const {username} = req.params;
-   const {username} = req.user;
+  const {username} = req.params;
   const sql = "UPDATE user SET roles=? WHERE username=?";
   mysql.execute(sql, [roles, username], sqlexec(res, mysql));
 });
@@ -91,6 +75,9 @@ router.post("/login", (req, res) => {
     }
   });
 });
+
+router.post("/logout",auth(),logout)
+
 
 // router.get('/:id',auth, (req,res)=>{
 //    const {id} = req.params

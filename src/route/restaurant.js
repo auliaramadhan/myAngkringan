@@ -24,16 +24,8 @@ router.get("/", (req, res) => {
   mysql.execute(sql, [], sqlexec(res, mysql));
 });
 
-router.post("/addrestaurant", auth, upload.single("image"), (req, res) => {
+router.post("/addrestaurant", auth('admin'), upload.single("image"), (req, res) => {
   const image = dir + req.file.filename;
-  if (req.user.roles !== "admin") {
-    res.send({ success: false, msg: "we siapa lu" });
-    fs.unlink(image, err => {
-      if (err) throw err;
-      console.log("successfully deleted " + image);
-    });
-    return;
-  }
   const { name, x, y, description } = req.body;
 
   const sql =
@@ -42,21 +34,8 @@ router.post("/addrestaurant", auth, upload.single("image"), (req, res) => {
   mysql.execute(sql, [name, image,x, y , description], sqlexec(res, mysql));
 });
 
-router.put(
-  "/changerestaurant/:id",
-  auth,
-  upload.single("image"),
-  (req, res) => {
+router.put("/changerestaurant/:id", auth('admin'),upload.single("image"),(req, res) => {
     const image = dir + req.file.filename;
-    if (req.user.roles !== "admin") {
-      res.send({ success: false, msg: "we siapa lu" });
-      fs.unlink(image, err => {
-        if (err) throw err;
-        console.log("successfully deleted " + image);
-      });
-      return;
-    }
-
     const { name, x, y, description } = req.body;
     const { id } = req.params;
 
