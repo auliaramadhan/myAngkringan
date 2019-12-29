@@ -24,7 +24,7 @@ function auth(roles) {
           req.user = user;
           next();
         } catch (err) {
-          console.log(err);
+         
           if (err.message === 'jwt expired') res.send({ success: false, msg: "jwt token expired" });
           else res.send({ success: false, msg: "jwt invalid" });
         }
@@ -47,7 +47,7 @@ function setallowed(params) {
       res.send({ success: false, msg: "access denied" });
       // fs.unlink(image, err => {
       //   if (err) throw err;
-      //   console.log("successfully deleted " + image);
+      //  
       // });
       // return;
     } else next();

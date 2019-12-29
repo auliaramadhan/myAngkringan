@@ -7,12 +7,12 @@ const { auth , logout} = require("../middleware/auth");
 const { sqlexec } = require("../middleware/mysql");
 
 
-router.get('/', auth(['admin']), (req, res) =>{ console.log({...req.params, ...req.body, ...req.query})
+router.get('/', auth(['admin']), (req, res) =>{
   const sql = "select * from user";
   mysql.execute(sql, [], sqlexec(res, mysql));
 })
 
-router.post("/registrasi",(req, res) => { console.log({...req.params, ...req.body, ...req.query})
+router.post("/registrasi",(req, res) => {
   const { username, password } = req.body;
   const enc_pass = bcrypt.hashSync(password);
   const sql = "INSERT INTO user (username,password,roles) VALUES(?,?,?)";
@@ -20,7 +20,7 @@ router.post("/registrasi",(req, res) => { console.log({...req.params, ...req.bod
   mysql.execute(sql, [username, enc_pass, 'customer'], sqlexec(res, mysql));
 });
 
-router.post("/createmanager", auth(['admin']), (req, res) => { console.log({...req.params, ...req.body, ...req.query})
+router.post("/createmanager", auth(['admin']), (req, res) => {
   const { username, password, id_restaurant } = req.body;
   const enc_pass = bcrypt.hashSync(password);
   const sql =
@@ -34,7 +34,7 @@ router.post("/createmanager", auth(['admin']), (req, res) => { console.log({...r
 });
 
 
-router.put("/changeuser/:username", auth([]) , (req, res) => { console.log({...req.params, ...req.body, ...req.query})
+router.put("/changeuser/:username", auth([]) , (req, res) => {
   const { password } = req.body;
   const { username } = req.user;
   const enc_pass = bcrypt.hashSync(password);
@@ -47,19 +47,19 @@ router.put("/changeuser/:username", auth([]) , (req, res) => { console.log({...r
   mysql.execute(sql, [enc_pass, username], sqlexec(res, mysql));
 });
 
-router.put("/changeroles/:username", auth(['admin']), (req, res) => { console.log({...req.params, ...req.body, ...req.query})
+router.put("/changeroles/:username", auth(['admin']), (req, res) => {
   const { roles, id_restaurant } = req.body;
   const {username} = req.params;
   const sql = "UPDATE user SET roles=?, id_restaurant=? WHERE username=?";
   mysql.execute(sql, [roles, id_restaurant, username], sqlexec(res, mysql));
 });
 
-router.post("/login", (req, res) => { console.log({...req.params, ...req.body, ...req.query})
+router.post("/login", (req, res) => {
   const { username, password } = req.body;
-  console.log(req.body);
+ 
   const sql = "SELECT * FROM user where username=?";
   mysql.execute(sql, [username], (err, result, field) => {
-    console.log(result);
+   
     if (result.length > 0) {
       if (bcrypt.compareSync(password, result[0].password)) {
         // const auth = JWT.sign({ ...result[0], id: null }, process.env.APP_KEY);

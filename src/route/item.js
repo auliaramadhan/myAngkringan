@@ -28,9 +28,9 @@ var storage = multer.diskStorage({
 });
 var upload = multer({ storage: storage , fileFilter});
 
-// router.get("", (req, res) => { console.log({...req.params, ...req.body, ...req.query})
+// router.get("", (req, res) => {
 //   let { page, order,limit } = req.query;
-//   console.log({ hai:'da',...req.query})
+//  
 //   // order = order ? "item." + order :  "restaurant.id" ;
 //   // page = page || 1;
 //   // limit = limit || 10;
@@ -43,14 +43,14 @@ var upload = multer({ storage: storage , fileFilter});
 //   //     item.created_on, item.updated_on, restaurant.name , COUNT(*) AS "total_data"
 //   //   FROM item JOIN restaurant on item.id_restaurant=restaurant.id
 //   //   ORDER BY ${order} LIMIT ${limit} OFFSET ${page*limit-limit} `;
-//   //   // console.log(sql)
+//   //   /
 //   //   mysql.execute(sql, [], sqlexecData(res, mysql,{page, limit}));
 //   });
   
 
-router.get(['',"/search"], (req, res) => { console.log({...req.params, ...req.body, ...req.query})
+router.get(['',"/search"], (req, res) => {
   let { page, order, name, price, rating, limit, byRestaurant} = req.query;
-  console.log(req.query)
+ 
   name = name ? ` item.name LIKE "%${name}%" ` : `item.name LIKE "%%"`;
   price = price ? ` AND item.price= "${price}"` : "";
   rating = rating ?  ` AND item.rating=ROUND(${rating},0) ` : "";
@@ -72,12 +72,12 @@ router.get(['',"/search"], (req, res) => { console.log({...req.params, ...req.bo
   union (select count(*),null,null,null,null,null,null,null,null from item 
   ${where} ${name} ${price} ${rating} ${byRestaurant})`;
 
-  console.log(sql)
+ 
 
   mysql.execute(sql, [], sqlexecData(res, mysql,{page,limit}));
 }); 
 
-router.get("/:id_item", (req, res) => { console.log({...req.params, ...req.body, ...req.query})
+router.get("/:id_item", (req, res) => {
   const { id_item } = req.params;
   const sql = `SELECT  * FROM item where id_category=(SELECT id_category from item WHERE id=?) 
   and id_restaurant=(SELECT id_restaurant from item WHERE id=?)
@@ -88,21 +88,21 @@ router.get("/:id_item", (req, res) => { console.log({...req.params, ...req.body,
 });
 
 
-// router.post("/additem", auth('manager'), upload.single("image"), (req, res) => { console.log({...req.params, ...req.body, ...req.query})
-router.post("/", auth(['manager']), upload.single("image"), (req, res) => { console.log({...req.params, ...req.body, ...req.query})
+// router.post("/additem", auth('manager'), upload.single("image"), (req, res) => {
+router.post("/", auth(['manager']), upload.single("image"), (req, res) => {
   const image = dir + req.file.filename +".jpg";
   const { id_restaurant } = req.user.id_restaurant? req.user:req.body;
   const { name, price , id_category} = req.body;
   
-  console.log({...req.params, ...req.body, ...req.query})
+ 
   const sql =
     "INSERT INTO item (name, price, image, id_restaurant, id_category) VALUES (?,?,?,?,?)";
 
   mysql.execute(sql, [name, price, image, id_restaurant, id_category], sqlexec(res, mysql));
 });
 
-router.put("/:id", auth(['manager', 'admin']), upload.single("image"), (req, res) => { console.log({...req.params, ...req.body, ...req.query})
-  console.log({...req.params, ...req.body, ...req.query})
+router.put("/:id", auth(['manager', 'admin']), upload.single("image"), (req, res) => {
+ 
 
   const image = dir + req.file.filename;
   /*nanti ditambah buat gambar lama
@@ -119,8 +119,8 @@ router.put("/:id", auth(['manager', 'admin']), upload.single("image"), (req, res
   // mysql.execute(sql, [name, price, image,id_category, id, id_restaurant], sqlexec(res, mysql));
 });
 
-router.delete("/:id", auth(['manager', 'admin']), (req, res) => { console.log({...req.params, ...req.body, ...req.query})
-  console.log({...req.params, ...req.body, ...req.query})
+router.delete("/:id", auth(['manager', 'admin']), (req, res) => {
+ 
 
   const { id_restaurant } = req.user.id_restaurant? req.user:req.body;
   const {id}  = req.params;

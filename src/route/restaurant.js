@@ -29,16 +29,16 @@ var storage = multer.diskStorage({
 var upload = multer({ storage: storage, fileFilter });
 
 router.get("/", auth([]), (req, res) => {
-  console.log({ ...req.params, ...req.body, ...req.query });
+ 
   const sql = "SELECT * FROM restaurant";
 
   mysql.execute(sql, [1,2], sqlexec(res, mysql));
 
-  console.log();
+ 
 });
 
 router.get("/:id", auth([]), (req, res) => {
-  console.log({ ...req.params, ...req.body, ...req.query });
+ 
   const sql = "SELECT * FROM restaurant where id=?";
   mysql.execute(sql, [req.params.id], sqlexec(res, mysql));
 });
@@ -47,13 +47,13 @@ router.post("/", auth(["admin"]), upload.single("image"), async (req, res) => {
   const image = dir + req.file.filename;
   let { geolocation, name, lating, description } = req.body;
   lating = lating.split(",");
-  
+
   // if (geolocation) {
   //   let data = await fetch(
   //     `http://us1.locationiq.com/v1/search.php?key=c0d3e3930c0c4b&q=
   //     ${geolocation.split(" ").join("+")}&format=json`
   //   ).then(result => result.json()).then(resul => resul[0]);
-  //   console.log(data)
+  //  
   //   lating = [data.lon, data.lan]
   //   nama = data.display_name
   // }
