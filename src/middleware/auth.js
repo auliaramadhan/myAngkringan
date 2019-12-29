@@ -1,7 +1,7 @@
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const redis = require("redis");
-const client = redis.createClient(6379);
+const client = redis.createClient(process.env.REDIS_PORT);
 
 function auth(roles) {
   return (req, res, next) => {
@@ -18,7 +18,7 @@ function auth(roles) {
         try  {
           const user = jwt.verify(jwt_token, process.env.APP_KEY);
           console.log(user);
-          if (user.roles !== roles && roles !== undefined) {
+          if (!(user.roles in roles) && roles.length !== 0) {
             res.send({ success: false, msg: "access denied" });
             return;
           }

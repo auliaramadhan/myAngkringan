@@ -89,25 +89,28 @@ router.get("/:id_item", (req, res) => {
 
 
 // router.post("/additem", auth('manager'), upload.single("image"), (req, res) => {
-router.post("/", auth('manager'), upload.single("image"), (req, res) => {
+router.post("/", auth(['manager']), upload.single("image"), (req, res) => {
   const image = dir + req.file.filename +".jpg";
-  // const {id_restaurant} = req.user;
-  const { name, price , id_category, id_restaurant} = req.body;
+  const { id_restaurant } = req.user.id_restaurant? req.user:req.body;
+  const { name, price , id_category} = req.body;
   
+  console.log({...req.params, ...req.body, ...req.query})
   const sql =
     "INSERT INTO item (name, price, image, id_restaurant, id_category) VALUES (?,?,?,?,?)";
 
   mysql.execute(sql, [name, price, image, id_restaurant, id_category], sqlexec(res, mysql));
 });
 
-router.put("/:id", auth('manager'), upload.single("image"), (req, res) => {
+router.put("/:id", auth(['manager', 'admin']), upload.single("image"), (req, res) => {
+  console.log({...req.params, ...req.body, ...req.query})
+
   const image = dir + req.file.filename;
   /*nanti ditambah buat gambar lama
 
    */
   const {id}= req.params;
   const { name, price,id_category } = req.body;
-  const { id_restaurant } = req.user;
+  const { id_restaurant } = req.user.id_restaurant? req.user:req.body;
 
   const sql = "UPDATE item SET name=?, price=?, image=?, id_category=? WHERE id=?";
   // const sql = "UPDATE item SET name=?, price=?, image=?, id_category=? WHERE id=? AND id_restaurant=?";
@@ -116,8 +119,10 @@ router.put("/:id", auth('manager'), upload.single("image"), (req, res) => {
   // mysql.execute(sql, [name, price, image,id_category, id, id_restaurant], sqlexec(res, mysql));
 });
 
-router.delete("/:id", auth('manager'), (req, res) => {
-  const {id_restaurant}  = req.user;
+router.delete("/:id", auth(['manager', 'admin']), (req, res) => {
+  console.log({...req.params, ...req.body, ...req.query})
+
+  const { id_restaurant } = req.user.id_restaurant? req.user:req.body;
   const {id}  = req.params;
   const sql = `DELETE FROM item WHERE id=? AND id_restaurant=?`;
 

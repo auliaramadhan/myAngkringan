@@ -6,6 +6,12 @@ const mysql = require("../dbconfig");
 const { auth , logout} = require("../middleware/auth");
 const { sqlexec } = require("../middleware/mysql");
 
+
+router.get('/', auth(['admin']), (req, res) =>{
+  const sql = "select * from user";
+  mysql.execute(sql, [], sqlexec(res, mysql));
+})
+
 router.post("/registrasi",(req, res) => {
   const { username, password } = req.body;
   const enc_pass = bcrypt.hashSync(password);
@@ -14,7 +20,7 @@ router.post("/registrasi",(req, res) => {
   mysql.execute(sql, [username, enc_pass, 'customer'], sqlexec(res, mysql));
 });
 
-router.post("/createmanager", auth('admin'), (req, res) => {
+router.post("/createmanager", auth(['admin']), (req, res) => {
   const { username, password, id_restaurant } = req.body;
   const enc_pass = bcrypt.hashSync(password);
   const sql =
@@ -28,7 +34,7 @@ router.post("/createmanager", auth('admin'), (req, res) => {
 });
 
 
-router.put("/changeuser/:username", auth() , (req, res) => {
+router.put("/changeuser/:username", auth([]) , (req, res) => {
   const { password } = req.body;
   const { username } = req.user;
   const enc_pass = bcrypt.hashSync(password);
@@ -41,7 +47,7 @@ router.put("/changeuser/:username", auth() , (req, res) => {
   mysql.execute(sql, [enc_pass, username], sqlexec(res, mysql));
 });
 
-router.put("/changeroles/:username", auth('admin'), (req, res) => {
+router.put("/changeroles/:username", auth(['admin']), (req, res) => {
   const { roles, id_restaurant } = req.body;
   const {username} = req.params;
   const sql = "UPDATE user SET roles=? id_restaurant=? WHERE username=?";
@@ -77,15 +83,6 @@ router.post("/login", (req, res) => {
   });
 });
 
-router.post("/logout",auth(),logout)
-
-
-// router.get('/:id',auth, (req,res)=>{
-//    const {id} = req.params
-//    const sql = 'SELECT * FROM user where id=?'
-//    mysql.execute(sql,[id],(err, result, field) => {
-//       res.send(result)
-//    })
-// })
+router.post("/logout",auth([]),logout)
 
 module.exports = router;

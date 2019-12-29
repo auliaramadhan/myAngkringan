@@ -46,21 +46,4 @@ function sqlexecData(res, mysql, data_page) {
 }
 
 
-function getdata(finalresult, mysql) {
-  return (err, result, field) => {
-    try {
-      if (err) {
-        console.log(err)
-        mysql.close();
-      } else {
-        finalresult = result; 
-        // console.log(field);
-      }
-    } catch (error) {
-      console.log(error);
-      mysql.close();
-    }
-  };
-}
-
 module.exports = { sqlexec , sqlexecData};

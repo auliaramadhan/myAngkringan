@@ -3,7 +3,7 @@ const mysql = require("../dbconfig");
 const { auth } = require("../middleware/auth");
 const { sqlexec } = require("../middleware/mysql");
 
-router.get("/", auth(), (req, res) => {
+router.get("/", auth([]), (req, res) => {
   const { id } = req.user;
   const sql = `SELECT cart.id, item.name, item.price, item.image, item.rating, cart.qty
     ,(cart.qty * item.price) AS \`total harga\`
@@ -11,7 +11,7 @@ router.get("/", auth(), (req, res) => {
   mysql.execute(sql, [id], sqlexec(res, mysql));
 });
 
-router.post("/putitemtocart", auth('customer'), (req, res) => {
+router.post("/putitemtocart", auth(['customer']), (req, res) => {
   const id_user = req.user.id;
   const { id_item, qty } = req.body;
   const sql = "INSERT INTO cart (id_user, id_item,qty) VALUES (?,?,?)";
@@ -19,7 +19,7 @@ router.post("/putitemtocart", auth('customer'), (req, res) => {
   mysql.execute(sql, [id_user, id_item, qty], sqlexec(res, mysql));
 });
 
-router.put("/changeitemqty/:id", auth('customer'), (req, res) => {
+router.put("/changeitemqty/:id", auth(['customer']), (req, res) => {
   const id_user = req.user.id;
   const id = req.params.id;
   const { qty } = req.body;
@@ -28,10 +28,17 @@ router.put("/changeitemqty/:id", auth('customer'), (req, res) => {
   mysql.execute(sql, [qty, id, id_user], sqlexec(res, mysql));
 });
 
-router.delete("/removefromcart/:id", auth('customer'), (req, res) => {
+router.delete("/cleanmycart", auth(['customer']), (req, res) => {
+  const id_user = req.user.id;
+  const sql ="DELETE FROM cart where id_user=?";
+
+  mysql.execute(sql, [id,id_user], sqlexec(res, mysql));
+});
+
+router.delete("/:id", auth(['customer']), (req, res) => {
   const id = req.params.id;
   const id_user = req.user.id;
-  const sql = "DELETE FROM cart where id=? AND id_user=?";
+  const sql ="DELETE FROM cart where id=? AND id_user=?";
 
   mysql.execute(sql, [id,id_user], sqlexec(res, mysql));
 });

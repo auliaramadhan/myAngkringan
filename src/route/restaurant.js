@@ -26,14 +26,19 @@ var storage = multer.diskStorage({
 });
 var upload = multer({ storage: storage, fileFilter });
 
-router.get("/",auth(), (req, res) => {
+router.get("/",auth([]), (req, res) => {
   const sql = "SELECT * FROM restaurant";
-  mysql.execute(sql, [], sqlexec(res, mysql));
+  mysql.execute(sql, [1,2], sqlexec(res, mysql));
+});
+
+router.get("/:id",auth([]), (req, res) => {
+  const sql = "SELECT * FROM restaurant where id=?";
+  mysql.execute(sql, [req.params.id], sqlexec(res, mysql));
 });
 
 router.post(
   "/",
-  auth("admin"),
+  auth(["admin"]),
   upload.single("image"),
   (req, res) => {
     const image = dir + req.file.filename;
@@ -55,7 +60,7 @@ router.post(
 
 router.put(
   "/:id",
-  auth("admin"),
+  auth(["admin"]),
   upload.single("image"),
   (req, res) => {
     const image = dir + req.file.filename;
@@ -75,21 +80,5 @@ router.put(
     }
   }
 );
-
-// router.delete("/:id", auth("admin"), upload.single("image"),(req, res) => {
-//     const { id } = req.params;
-//     try {
-//       const sql =
-//         "DELETE FROM restaurant WHERE id=?";
-
-//       mysql.execute(
-//         sql,[ id],
-//         sqlexec(res, mysql)
-//       );
-//     } catch (error) {
-//       console.log(error)
-//     }
-//   }
-// );
 
 module.exports = router;
