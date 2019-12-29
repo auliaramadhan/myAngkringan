@@ -1,42 +1,44 @@
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
-const redis = require('redis');
-const client = redis.createClient(6379)
+const redis = require("redis");
+const client = redis.createClient(6379);
 
-function auth(roles){
-return (req, res, next) => {
-  if (
-    req.headers["authorization"] &&
-    req.headers["authorization"].startsWith("Bearer")
-  ) {
-    const jwt_token = req.headers["authorization"].substr(7);
-    try {
-      client.sismember('revokedToken',jwt_token,(err,reply)=>{
+function auth(roles) {
+  return (req, res, next) => {
+    if (
+      req.headers["authorization"] &&
+      req.headers["authorization"].startsWith("Bearer")
+    ) {
+      const jwt_token = req.headers["authorization"].substr(7);
+      client.sismember("revokedToken", jwt_token, (err, reply) => {
         if (reply) {
           res.send({ success: false, msg: "must login first" });
-            return;
-        }
-        const user = jwt.verify(jwt_token, process.env.APP_KEY)
-        if (user.roles !== roles && roles!==undefined) {
-          res.send({ success: false, msg: "access denied" });
           return;
         }
-        req.user = user;
-        next();
-      })
-    } catch (err) {
-      console.log(err);
-      res.send({ success: false, msg: "jwt invalid" });
+        try  {
+          const user = jwt.verify(jwt_token, process.env.APP_KEY);
+          console.log(user);
+          if (user.roles !== roles && roles !== undefined) {
+            res.send({ success: false, msg: "access denied" });
+            return;
+          }
+          req.user = user;
+          next();
+        } catch (err) {
+          console.log(err);
+          if (err.message === 'jwt expired') res.send({ success: false, msg: "jwt token expired" });
+          else res.send({ success: false, msg: "jwt invalid" });
+        }
+      });
+    } else {
+      res.send({ success: false, msg: "must login first" });
     }
-  } else {
-    res.send({ success: false, msg: "must login first" });
-  }
-}
+  };
 }
 
-function logout(req,res,next) {
+function logout(req, res, next) {
   const jwt_token = req.headers["authorization"].substr(7);
-  client.sadd('revokedToken', jwt_token)
+  client.sadd("revokedToken", jwt_token);
   res.send({ success: true, msg: "logout success" });
 }
 
@@ -53,4 +55,4 @@ function setallowed(params) {
   };
 }
 
-module.exports = { auth , logout};
+module.exports = { auth, logout };
