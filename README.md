@@ -56,18 +56,56 @@ REDIS_PORT=your_port
 * `/review/:id_item` (Get all review by id_item)
 
 **2. POST**
-* `/`
-    * ``` { "title": "Party", "note": "Herman's Party at 19.00", "category": 1 } ```
+* `/user/registrasi`
+    * ``` { "username" : "auliaramadhan", "password" : "1234" } ```
+
+* `/user/createmanager`
+    * ``` { "username" : "auliamanager3","password" : "1234","id_restaurant" : "2" } ```
+
+* `/user/login`
+    * ``` { "username" : "auliaramadhan", "password" : "1234" } ```
+
+* `/user/logout`
+
+* `/restaurant`
+    * ``` { "name" : "kentucky fried chicken","lating" : "-6.5483965,106.9711935","description" : "makanan cepat saji"  "image" :[]} ```
 
 * `/category`
-    * ``` { "categoryName": "Category6" } ```
+    * ``` { "name" : "makanan" berat',"description" : "makanan" } ```
 
-**3. PATCH**
-* `/note/:id` (Update note by id)
-   * ``` { "title": "Party", "note": "Herman's Party at 18.00", "category": 2 } ```
-* `/category/:id` (Update category by id)
-   * ``` { "categoryName": "Category8" } ```
+* `/item`
+    * ``` { "name" : "rendang", "price" : "15000", "id_category" : "3", "image" :[image] } ```
+
+* `/review`
+    * ``` { "review" : "Kurang" Enak', "rating" : "4", "id_item" : "12"}```
+
+* `/cart`
+    * ``` { "id_item" : "39", "qty" : "2" }```
+
+**3. PUT**
+* `/user/changeroles/:username`
+    ```{ "id_restaurant" : "11","roles" : "pelanggan" }```
+
+* `/user/changeuser/:username`
+    ```{ "username" : "auliaramadhan", "password" : "1234" }```
+
+* `/restaurant`
+    * ``` { "name" : "kentucky fried chicken","lating" : "-6.5483965,106.9711935","description" : "makanan cepat saji" "image" :[] } ```
+
+* `/category`
+    * ``` { "name" : "makanan berat","description" : "makanan" } ```
+
+* `/item`
+    * ``` { "name" : "rendang", "price" : "15000", "image" :[image] } ```
+
+* `/review`
+    * ``` { "review" : "Kurang Enak", "rating" : "4"}```
+
+* `/cart/changeitemqty`
+    * ``` {  "qty" : "2" }```
 
 **4. DELETE**
-* `/note/:id` (Delete note by id)
-* `/category/:id` (Delete category by id)
+* `/item/:id` (Delete item by id)
+* `/review/:id` (Delete review by id)
+* `/cart/:id` (Delete cart by id)
+* `/cart/cleanmycart` (Delete all item in cart by user login)

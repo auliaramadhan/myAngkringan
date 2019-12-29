@@ -17,8 +17,7 @@ function auth(roles) {
         }
         try  {
           const user = jwt.verify(jwt_token, process.env.APP_KEY);
-          console.log(user);
-          if (!(user.roles in roles) && roles.length !== 0) {
+          if (!roles.includes(user.roles) && roles.length !== 0) {
             res.send({ success: false, msg: "access denied" });
             return;
           }
