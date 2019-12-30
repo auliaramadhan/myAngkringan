@@ -2,7 +2,6 @@ function sqlexec(res, mysql) {
   return (err, result, field) => {
     try {
       if (err) {
-       
         if (err.code === "ER_DUP_ENTRY")
           res.send({ success: false, msg: "username already exist" });
         else res.send({ success: false, msg: "error in database" });
@@ -10,8 +9,7 @@ function sqlexec(res, mysql) {
       } else {
         res.send({ success: true, data: result});
       }
-    } catch (error) {
-     
+    } catch (error) {     
       return;
     }
   };

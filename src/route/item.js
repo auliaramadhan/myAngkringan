@@ -90,7 +90,7 @@ router.get("/:id_item", (req, res) => {
 
 // router.post("/additem", auth('manager'), upload.single("image"), (req, res) => {
 router.post("/", auth(['manager']), upload.single("image"), (req, res) => {
-  const image = dir + req.file.filename +".jpg";
+  const image = dir + req.file.filename;
   const { id_restaurant } = req.user.id_restaurant? req.user:req.body;
   const { name, price , id_category} = req.body;
   

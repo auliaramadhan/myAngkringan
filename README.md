@@ -1,10 +1,10 @@
 # myAngkringan
 
-<h1 align="center">ExpressJS - Simple Notes App RESTfull API</h1>
+<h1 align="center">MyAngkringan - Simple restaurant app</h1>
 
 
 
-Note App is a simple note application specially for backend only. Built with NodeJs using the ExpressJs Framework.
+MyAngkringan is a simple restaurant application specially for backend. Built with NodeJs using the ExpressJs Framework.
 Express.js is a web application framework for Node.js. [More about Express](https://en.wikipedia.org/wiki/Express.js)
 ## Built With
 [![Express.js](https://img.shields.io/badge/Express.js-4.x-orange.svg?style=rounded-square)](https://expressjs.com/en/starter/installing.html)
@@ -21,9 +21,9 @@ Express.js is a web application framework for Node.js. [More about Express](http
 1. Open app's directory in CMD or Terminal
 2. Type `npm install` [here](#requirements)
 3. Make new file a called **.env**, set up first [here](#set-up-env-file)
-4. turn on your redis sever.
+4. Turn on your redis sever.
 4. Turn on Web Server and MySQL can using Third-party tool like xampp, etc.
-5. Create a database with the name note, and Import file [backup.sql](backup.sql) to **phpmyadmin**
+5. Create a database with the name myangkringan, and Import file [backup.sql](backup.sql) to **phpmyadmin**
 6. Open Postman desktop application or Chrome web app extension that has installed before
 7. Choose HTTP Method and enter request url.(ex. localhost:3000/item)
 8. You can see all the end point [here](#end-point)

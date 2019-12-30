@@ -43,7 +43,7 @@ router.get("/:id", auth([]), (req, res) => {
   mysql.execute(sql, [req.params.id], sqlexec(res, mysql));
 });
 
-router.post("/", auth(["admin"]), upload.single("image"), async (req, res) => {
+router.post("/", auth(["admin"]), upload.single("image"), (req, res) => {
   const image = dir + req.file.filename;
   let { geolocation, name, lating, description } = req.body;
   lating = lating.split(",");
@@ -70,7 +70,7 @@ router.post("/", auth(["admin"]), upload.single("image"), async (req, res) => {
   }
 });
 
-router.put("/:id", auth(["admin"]), upload.single("image"), (req, res) => {
+router.put("/change/:id", auth(["admin"]), upload.single("image"), (req, res) => {
   const image = dir + req.file.filename;
   let { name, lating, description } = req.body;
   const { id } = req.params;

@@ -12,6 +12,8 @@ router.get('/', auth(['admin']), (req, res) =>{
   mysql.execute(sql, [], sqlexec(res, mysql));
 })
 
+// bikin profil
+
 router.post("/registrasi",(req, res) => {
   const { username, password } = req.body;
   const enc_pass = bcrypt.hashSync(password);

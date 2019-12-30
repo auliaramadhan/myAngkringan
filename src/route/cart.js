@@ -3,6 +3,8 @@ const mysql = require("../dbconfig");
 const { auth } = require("../middleware/auth");
 const { sqlexec } = require("../middleware/mysql");
 
+// bikin checkout
+
 router.get("/", auth([]), (req, res) => {
   const { id } = req.user;
   const sql = `SELECT cart.id, item.name, item.price, item.image, item.rating, cart.qty

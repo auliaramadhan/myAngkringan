@@ -22,7 +22,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // ini dibawah biar bisa pake form data
 // app.use(upload.array());
 
-app.use(express.static("public"));
+app.use(express.static(__dirname+"/public"));
+
+console.log(__dirname+"/public")
 
 app.use("/user", user);
 app.use("/cart", cart);
