@@ -10,6 +10,7 @@ function auth(roles) {
       req.headers["authorization"].startsWith("Bearer")
     ) {
       const jwt_token = req.headers["authorization"].substr(7);
+      console.log(jwt_token)
       client.sismember("revokedToken", jwt_token, (err, reply) => {
         if (reply) {
           res.send({ success: false, msg: "must login first" });
@@ -24,9 +25,8 @@ function auth(roles) {
           req.user = user;
           next();
         } catch (err) {
-         
-          if (err.message === 'jwt expired') res.send({ success: false, msg: "jwt token expired" });
-          else res.send({ success: false, msg: "jwt invalid" });
+            if (err.message === 'jwt expired') res.send({ success: false, msg: "jwt token expired" });
+            else res.send({ success: false, msg: "jwt invalid" });
         }
       });
     } else {

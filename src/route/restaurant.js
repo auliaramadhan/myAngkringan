@@ -8,7 +8,7 @@ const fetch = require("node-fetch");
 const { auth } = require("../middleware/auth");
 const { sqlexec } = require("../middleware/mysql");
 
-const dir = "public/images/uploads/restaurant/";
+const dir = "/images/uploads/restaurant/";
 
 var multer = require("multer");
 var fileFilter = (req, file, callback) => {
@@ -28,7 +28,7 @@ var storage = multer.diskStorage({
 });
 var upload = multer({ storage: storage, fileFilter });
 
-router.get("/", auth([]), (req, res) => {
+router.get("/", (req, res) => {
  
   const sql = "SELECT * FROM restaurant";
 
@@ -38,7 +38,6 @@ router.get("/", auth([]), (req, res) => {
 });
 
 router.get("/:id", auth([]), (req, res) => {
- 
   const sql = "SELECT * FROM restaurant where id=?";
   mysql.execute(sql, [req.params.id], sqlexec(res, mysql));
 });
@@ -70,17 +69,16 @@ router.post("/", auth(["admin"]), upload.single("image"), (req, res) => {
   }
 });
 
-router.put("/change/:id", auth(["admin"]), upload.single("image"), (req, res) => {
+router.put("/:id", auth(["admin"]), upload.single("image"), (req, res) => {
   const image = dir + req.file.filename;
-  let { name, lating, description } = req.body;
-  const { id } = req.params;
+  const {id} = req.params
+  let { geolocation, name, lating, description } = req.body;
+  lating = lating.split(",");
   try {
-    const sql =
-      "UPDATE restaurant SET name=? ,longitude=?, latitude=?, logo=?,description=? WHERE id=?";
-
+    const sql = `UPDATE restaurant SET name=? ,longitude=?, latitude=?, logo=?,description=? WHERE id=?`;
     mysql.execute(
       sql,
-      [name, lating[0], lating[1], image, description, id],
+      [name, lating[0], lating[1],image, description, id],
       sqlexec(res, mysql)
     );
   } catch (error) {

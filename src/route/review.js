@@ -5,14 +5,18 @@ const { sqlexec } = require("../middleware/mysql");
 
 router.get("/myreview", auth(['customer']), (req, res) => {
   const id_user = req.user.id;
-  const sql ="SELECT * FROM review  WHERE id_user=?";
+  const sql ="SELECT * FROM review WHERE id_user=?";
   mysql.execute(sql, [id_user], sqlexec(res, mysql));
 });
 
-router.get("/:id_item", auth([]), (req, res) => {
+router.get("/:id_item", (req, res) => { 
+  console.log(req.user)
   const { id_item } = req.params;
   const sql =
-    "SELECT * FROM review WHERE review.id_item=?";
+    `SELECT user_profile.*, review.* FROM review Left JOIN user_profile 
+     on user_profile.id_user=review.id_user
+     WHERE review.id_item=?`;
+     console.log(sql)
   mysql.execute(sql, [id_item], sqlexec(res, mysql));
 });
 

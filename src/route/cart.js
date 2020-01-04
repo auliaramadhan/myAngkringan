@@ -15,17 +15,29 @@ router.get("/", auth([]), (req, res) => {
 
 router.post("/", auth(['customer']), (req, res) => {
   const id_user = req.user.id;
-  const { id_item, qty } = req.body;
-  const sql = "INSERT INTO cart (id_user, id_item,qty) VALUES (?,?,?)";
+  // const { id_item, qty } = req.body;
+  // const id = id_user.toString() + id_item.toString()
+  const sql = `INSERT INTO checkout (id_user) VALUES (?)`;
 
-  mysql.execute(sql, [id_user, id_item, qty], sqlexec(res, mysql));
+  mysql.execute(sql, [id_user], sqlexec(res, mysql));
+});
+
+router.post("/", auth(['customer']), (req, res) => {
+  const id_user = req.user.id;
+  const { id_item, qty } = req.body;
+  const id = id_user.toString() + id_item.toString()
+  const sql = `INSERT INTO cart (id,id_user, id_item,qty) VALUES ( ?,?,?,?)
+          ON DUPLICATE KEY UPDATE qty = Values(qty)`;
+
+  mysql.execute(sql, [id, id_user, id_item, qty], sqlexec(res, mysql));
 });
 
 router.put("/changeitemqty/:id", auth(['customer']), (req, res) => {
   const id_user = req.user.id;
-  const id = req.params.id;
+  const id_item = req.params.id;
+  const id = id_user.toString() + id_item.toString()
   const { qty } = req.body;
-  const sql = "UPDATE cart SET qty=? WHERE id=? AND id_user=?";
+  const sql = "UPDATE cart SET qty=? WHERE id=?";
 
   mysql.execute(sql, [qty, id, id_user], sqlexec(res, mysql));
 });
