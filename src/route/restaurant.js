@@ -70,17 +70,16 @@ router.post("/", auth(["admin"]), upload.single("image"), (req, res) => {
   }
 });
 
-router.put("/change/:id", auth(["admin"]), upload.single("image"), (req, res) => {
+router.put("/:id", auth(["admin"]), upload.single("image"), (req, res) => {
   const image = dir + req.file.filename;
-  let { name, lating, description } = req.body;
-  const { id } = req.params;
+  const {id} = req.params
+  let { geolocation, name, lating, description } = req.body;
+  lating = lating.split(",");
   try {
-    const sql =
-      "UPDATE restaurant SET name=? ,longitude=?, latitude=?, logo=?,description=? WHERE id=?";
-
+    const sql = `UPDATE restaurant SET name=? ,longitude=?, latitude=?, logo=?,description=? WHERE id=?`;
     mysql.execute(
       sql,
-      [name, lating[0], lating[1], image, description, id],
+      [name, lating[0], lating[1],image, description, id],
       sqlexec(res, mysql)
     );
   } catch (error) {

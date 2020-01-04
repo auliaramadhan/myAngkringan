@@ -5,9 +5,12 @@ function sqlexec(res, mysql) {
         if (err.code === "ER_DUP_ENTRY")
           res.send({ success: false, msg: "username already exist" });
         else res.send({ success: false, msg: "error in database" });
+        console.log(err)
         return;
       } else {
-        res.send({ success: true, data: result});
+        if (result.affectedRows===0) {
+          res.send({ success:false , data: result});
+        }else  res.send({ success:true , data: result});
       }
     } catch (error) {     
       return;
@@ -19,7 +22,7 @@ function sqlexecData(res, mysql, data_page) {
   return (err, result, field) => {
     try {
       if (err) {
-       
+        console.log(err)
         if (err.code === 'ER_BAD_FIELD_ERROR')res.send({ success: false, msg: "query false" });
         else res.send({ success: false, msg: "error in database" });
         return ;
