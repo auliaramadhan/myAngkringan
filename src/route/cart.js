@@ -8,19 +8,19 @@ const { sqlexec } = require("../middleware/mysql");
 router.get("/", auth([]), (req, res) => {
   const { id } = req.user;
   const sql = `SELECT cart.id, item.name, item.price, item.image, item.rating, cart.qty
-    ,(cart.qty * item.price) AS \`total harga\`
-    FROM cart JOIN item on cart.id_item=item.id WHERE cart.id_user=?`;
+    ,(cart.qty * item.price) AS total_harga
+    FROM cart Left JOIN item on cart.id_item=item.id WHERE cart.id_user=?`;
   mysql.execute(sql, [id], sqlexec(res, mysql));
 });
 
-router.post("/", auth(['customer']), (req, res) => {
-  const id_user = req.user.id;
-  // const { id_item, qty } = req.body;
-  // const id = id_user.toString() + id_item.toString()
-  const sql = `INSERT INTO checkout (id_user) VALUES (?)`;
+// router.post("/", auth(['customer']), (req, res) => {
+//   const id_user = req.user.id;
+//   // const { id_item, qty } = req.body;
+//   // const id = id_user.toString() + id_item.toString()
+//   const sql = `INSERT INTO checkout (id_user) VALUES (?)`;
 
-  mysql.execute(sql, [id_user], sqlexec(res, mysql));
-});
+//   mysql.execute(sql, [id_user], sqlexec(res, mysql));
+// });
 
 router.post("/", auth(['customer']), (req, res) => {
   const id_user = req.user.id;

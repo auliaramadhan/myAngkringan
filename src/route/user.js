@@ -35,11 +35,11 @@ router.get("/", auth(["admin"]), (req, res) => {
 // bikin profil
 
 router.post("/registrasi", (req, res) => {
-  const { username, password } = req.body;
+  const { username, password, email } = req.body;
   const enc_pass = bcrypt.hashSync(password);
-  const sql = "INSERT INTO user (username,password,roles) VALUES(?,?,?)";
+  const sql = "INSERT INTO user (username,password,email,roles) VALUES(?,?,?)";
 
-  mysql.execute(sql, [username, enc_pass, "customer"], sqlexec(res, mysql));
+  mysql.execute(sql, [username, enc_pass,email, "customer"], sqlexec(res, mysql));
 });
 
 router.post("/createmanager", auth(["admin"]), (req, res) => {

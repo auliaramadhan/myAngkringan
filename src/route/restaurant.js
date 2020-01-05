@@ -32,7 +32,7 @@ router.get("/", (req, res) => {
  
   const sql = "SELECT * FROM restaurant";
 
-  mysql.execute(sql, [1,2], sqlexec(res, mysql));
+  mysql.execute(sql, [], sqlexec(res, mysql));
 
  
 });
