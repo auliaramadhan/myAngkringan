@@ -15,7 +15,7 @@ router.post("/", auth([]), (req, res) => {
   const { first_name, last_name, address, phone, city_of_birth, date_of_birth } = req.body;
   const { id } = req.user;
   const sql = `INSERT INTO user_profile (first_name, last_name,address,phone,id_user,
-      city_of_birth,date_of_birth) VALUES(?,?,?,?,?,?) ON DUPLICATE KEY UPDATE 
+      city_of_birth,date_of_birth) VALUES(?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE 
       first_name = Values(first_name),
       last_name = Values(last_name),
       address= Values(address),

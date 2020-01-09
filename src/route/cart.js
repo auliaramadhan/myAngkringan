@@ -7,8 +7,8 @@ const { sqlexec } = require("../middleware/mysql");
 
 router.get("/", auth([]), (req, res) => {
   const { id } = req.user;
-  const sql = `SELECT cart.id, item.name, item.price, item.image, item.rating, cart.qty
-    ,(cart.qty * item.price) AS total_harga
+  const sql = `SELECT cart.id, item.name, item.price, item.image,
+   item.rating, cart.qty,cart.total
     FROM cart Left JOIN item on cart.id_item=item.id WHERE cart.id_user=?`;
   mysql.execute(sql, [id], sqlexec(res, mysql));
 });
@@ -24,22 +24,47 @@ router.get("/", auth([]), (req, res) => {
 
 router.post("/", auth(['customer']), (req, res) => {
   const id_user = req.user.id;
-  const { id_item, qty } = req.body;
+  const { id_item, qty, total } = req.body;
   const id = id_user.toString() + id_item.toString()
-  const sql = `INSERT INTO cart (id,id_user, id_item,qty) VALUES ( ?,?,?,?)
-          ON DUPLICATE KEY UPDATE qty = Values(qty)`;
+  const sql = `INSERT INTO cart (id,id_user, id_item,qty, total) 
+          VALUES ( ?,?,?,?,?)
+          ON DUPLICATE KEY UPDATE qty = Values(qty),
+          total = VALUES(total)`;
+          // *(select price from item where id=?)
 
-  mysql.execute(sql, [id, id_user, id_item, qty], sqlexec(res, mysql));
+          // INSERT INTO `cart`(`id`, `id_user`, `id_item`, `qty`, `total`) VALUES (200, 11,8, 5,(select 5*price from item where id=8))
+  mysql.execute(sql, [id, id_user, id_item, qty, total], sqlexec(res, mysql));
 });
 
-router.put("/changeitemqty/:id", auth(['customer']), (req, res) => {
-  const id_user = req.user.id;
-  const id_item = req.params.id;
-  const id = id_user.toString() + id_item.toString()
-  const { qty } = req.body;
-  const sql = "UPDATE cart SET qty=? WHERE id=?";
 
-  mysql.execute(sql, [qty, id, id_user], sqlexec(res, mysql));
+router.post("/addcarts", auth(['customer']), (req, res) => {
+  const id_user = req.user.id;
+  const { id_item, qty } = req.body;
+  const id = id_user.toString() + id_item.toString()
+  // const sql = `INSERT INTO cart (id,id_user, id_item,qty, total) 
+  //         VALUES ( ?,?,?,?,(select ?*price from item where id=8))
+  //         ON DUPLICATE KEY UPDATE qty = Values(qty),
+  //         total = VALUES(total)`;
+  const datas = req.body.map((v) => {
+    const arrayTemp = new Array(5).fill("NULL")
+    arrayTemp[0] = v.id
+    arrayTemp[3] = v.qty
+  })
+
+          // INSERT INTO `cart`(`id`, `id_user`, `id_item`, `qty`, `total`) VALUES (200, 11,8, 5,(select 5*price from item where id=8))
+  mysql.execute(sql, datas, sqlexec(res, mysql));
+});
+
+router.put("/changeitemqty/", auth(['customer']), (req, res) => {
+  // const id_user = req.user.id;
+  // const id_item = req.params.id;
+  const { qty,id, total } = req.body;
+  // const id = req.body || id_user.toString() + id_item.toString()
+  // const sql = "UPDATE cart SET qty=? WHERE id=?";
+  // const sql = "UPDATE cart SET qty=?, total=qty*(SELECT price FROM item where id=id_item) WHERE id=?";
+  const sql = "UPDATE cart SET qty=?, total=? WHERE id=?";
+
+  mysql.execute(sql, [qty,total, id], sqlexec(res, mysql));
 });
 
 router.delete("/cleanmycart", auth(['customer']), (req, res) => {

@@ -47,14 +47,14 @@ var upload = multer({ storage: storage, fileFilter });
 //   });
 
 router.get(["", "/search"], (req, res) => {
-  let { page, order, name, price, rating, limit, byRestaurant, asc } = req.query;
+  let { page, order, name, price,category, rating, limit, byRestaurant, asc } = req.query;
 
   name = name ? ` item.name LIKE "%${name}%" ` : `item.name LIKE "%%"`;
   price = price ? ` AND item.price= "${price}"` : "";
   rating = rating ? ` AND item.rating=ROUND(${rating},0) ` : "";
   byRestaurant = byRestaurant ? ` AND id_restaurant=${byRestaurant} ` : "";
   order = order ? "item." + order : "restaurant.id";
-  // const AND = condition => (condition ? "" : "");
+  category = category? `AND item.id_category=${category}` : "";
   let where = name || price || rating ? "WHERE" : "";
   page = parseInt(page) || 1;
   limit = parseInt(limit) || 10;
@@ -66,10 +66,10 @@ router.get(["", "/search"], (req, res) => {
     item.created_on, item.updated_on, restaurant.name AS restauran, category.name as category
   FROM item JOIN restaurant on item.id_restaurant=restaurant.id 
   LEFT OUTER JOIN category on category.id=item.id_category
-  ${where} ${name} ${price} ${rating} ${byRestaurant}
+  ${where} ${name} ${price} ${rating} ${category} ${byRestaurant}
   ORDER BY ${order} ${asc} LIMIT ${limit} OFFSET ${page * limit - limit})
   union (select count(*),null,null,null,null,null,null,null,null from item 
-  ${where} ${name} ${price} ${rating} ${byRestaurant})`;
+  ${where} ${name} ${price} ${rating} ${category} ${byRestaurant})`;
 
   const pagequery = { current_page: page, limit, 
     link:req.get('host')+req.path, query: req.query }

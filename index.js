@@ -10,6 +10,7 @@ const express = require("express"),
   review = require("./src/route/review"),
   category = require("./src/route/category"),
   profile = require("./src/route/profile"),
+  checkout = require("./src/route/checkout"),
   multer = require("multer"),
   upload = multer(),
   cart = require("./src/route/cart");
@@ -34,6 +35,7 @@ app.use("/item", item);
 app.use("/review", review);
 app.use("/category", category);
 app.use("/profile", profile);
+app.use("/checkout",checkout);
 
 app.get("/", (req, res) => {
   res.send("helo");

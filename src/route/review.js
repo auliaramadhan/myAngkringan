@@ -15,7 +15,7 @@ router.get("/:id_item", (req, res) => {
   const sql =
     `SELECT user_profile.*, review.* FROM review Left JOIN user_profile 
      on user_profile.id_user=review.id_user
-     WHERE review.id_item=?`;
+     WHERE review.id_item=? ORDER BY review.updated_on desc`;
      console.log(sql)
   mysql.execute(sql, [id_item], sqlexec(res, mysql));
 });
@@ -23,14 +23,27 @@ router.get("/:id_item", (req, res) => {
 router.post("/", auth(['customer']), (req, res) => {
   const id_user = req.user.id;
   const { review, rating, id_item } = req.body;
+  const id = id_user.toString() + id_item.toString()
  
 
-  const sql = `INSERT INTO review (review, rating,id_item,id_user)
-   VALUES (?,?,?,?)`;
+  const sql = `INSERT INTO review (id, review, rating,id_item,id_user)
+   VALUES (?,?,?,?,?) ON DUPLICATE KEY UPDATE
+   review = VALUES(review), rating= VALUES(rating)`;
 
+  mysql.execute(sql, [id, review, rating, id_item, id_user], sqlexec(res, mysql));
+});
 
+router.post("/:id_item", auth(['customer']), (req, res) => {
+  const id_user = req.user.id;
+  const {id_item} = req.params;
+  const { review, rating } = req.body;
+  const id = id_user.toString() + id_item.toString()
+  
 
-  mysql.execute(sql, [review, rating, id_item, id_user], sqlexec(res, mysql));
+  const sql = `INSERT INTO review (id,review, rating,id_item,id_user)
+   VALUES (?,?,?,?,?)`;
+
+  mysql.execute(sql, [id, review, rating, id_item, id_user], sqlexec(res, mysql));
 });
 
 router.put("/:id", auth(['customer']), (req, res) => {
