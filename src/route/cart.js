@@ -8,7 +8,7 @@ const { sqlexec } = require("../middleware/mysql");
 router.get("/", auth([]), (req, res) => {
   const { id } = req.user;
   const sql = `SELECT cart.id, item.name, item.price, item.image,
-   item.rating, cart.qty,cart.total
+   item.rating, cart.qty,cart.total, item.id as id_item, item.image
     FROM cart Left JOIN item on cart.id_item=item.id WHERE cart.id_user=?`;
   mysql.execute(sql, [id], sqlexec(res, mysql));
 });
@@ -41,17 +41,12 @@ router.post("/addcarts", auth(['customer']), (req, res) => {
   const id_user = req.user.id;
   const { id_item, qty } = req.body;
   const id = id_user.toString() + id_item.toString()
-  // const sql = `INSERT INTO cart (id,id_user, id_item,qty, total) 
-  //         VALUES ( ?,?,?,?,(select ?*price from item where id=8))
-  //         ON DUPLICATE KEY UPDATE qty = Values(qty),
-  //         total = VALUES(total)`;
   const datas = req.body.map((v) => {
     const arrayTemp = new Array(5).fill("NULL")
     arrayTemp[0] = v.id
     arrayTemp[3] = v.qty
   })
 
-          // INSERT INTO `cart`(`id`, `id_user`, `id_item`, `qty`, `total`) VALUES (200, 11,8, 5,(select 5*price from item where id=8))
   mysql.execute(sql, datas, sqlexec(res, mysql));
 });
 

@@ -13,7 +13,9 @@ router.get("/",auth(["customer"]), (req, res) => {
 
 router.get("/detail/:id",auth(["customer"]), (req, res) => {
   const {id} = req.params
-  const sql = `SELECT * FROM checkout_detail where id_checkout=?`;
+  const sql = `SELECT * FROM checkout_detail join item 
+  on checkout_detail.id_item=item.id 
+  where checkout_detail.id_checkout=?`;
 
   
   mysql.execute(sql, [id], sqlexec(res, mysql));
