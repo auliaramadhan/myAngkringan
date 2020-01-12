@@ -21,6 +21,7 @@ router.get("/detail/:id",auth(["customer"]), (req, res) => {
 
 router.post("/", auth(["customer"]), (req, res) => {
    const {id} = req.user
+   console.log(req.body)
   const { first_name,last_name,phone,address, total_harga  } = req.body;
   const sql = `INSERT INTO checkout 
   (first_name, last_name, phone, address, id_user, total_harga)

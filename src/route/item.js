@@ -54,7 +54,7 @@ router.get(["", "/search"], (req, res) => {
   rating = rating ? ` AND item.rating=ROUND(${rating},0) ` : "";
   byRestaurant = byRestaurant ? ` AND id_restaurant=${byRestaurant} ` : "";
   order = order ? "item." + order : "restaurant.id";
-  category = category? `AND item.id_category=${category}` : "";
+  category = parseInt(category)? `AND item.id_category=${category}` : "";
   let where = name || price || rating ? "WHERE" : "";
   page = parseInt(page) || 1;
   limit = parseInt(limit) || 10;
