@@ -5,8 +5,9 @@ const bcrypt = require("bcryptjs");
 const mysql = require("../dbconfig");
 const { auth, logout } = require("../middleware/auth");
 const { sqlexec } = require("../middleware/mysql");
+const nodemailer = require('nodemailer')
 
-router.get("/auth",(req, res) => {
+router.get("/auth", (req, res) => {
   if (
     req.headers["authorization"] &&
     req.headers["authorization"].startsWith("Bearer")
@@ -40,7 +41,11 @@ router.post("/registrasi", (req, res) => {
   const enc_pass = bcrypt.hashSync(password);
   const sql = "INSERT INTO user (username,password,email,roles) VALUES(?,?,?,?)";
 
-  mysql.execute(sql, [username, enc_pass , email, "customer"], sqlexec(res, mysql));
+  try {    
+    mysql.execute(sql, [username, enc_pass, email, "customer"], sqlexec(res, mysql));
+  } catch (error) {
+    res.send({ success: false, msg: error });
+  }
 });
 
 router.post("/createmanager", auth(["admin"]), (req, res) => {
@@ -49,11 +54,15 @@ router.post("/createmanager", auth(["admin"]), (req, res) => {
   const sql =
     "INSERT INTO user (username,password,roles,id_restaurant) VALUES(?,?,?,?)";
 
-  mysql.execute(
-    sql,
-    [username, enc_pass, "manager", id_restaurant],
-    sqlexec(res, mysql)
-  );
+    try {
+      mysql.execute(
+        sql,
+        [username, enc_pass, "manager", id_restaurant],
+        sqlexec(res, mysql)
+      );
+    } catch (error) {
+      res.send({ success: false, msg: error });
+    }
 });
 
 router.put("/changeuser/:username", auth([]), (req, res) => {
@@ -80,34 +89,93 @@ router.post("/login", (req, res) => {
   const { username, password } = req.body;
 
   const sql = "SELECT * FROM user where username=?";
-  mysql.execute(sql, [username], (err, result, field) => {
-    if (result.length > 0) {
-      if (bcrypt.compareSync(password, result[0].password)) {
-        // const auth = JWT.sign({ ...result[0], id: null }, process.env.APP_KEY);
-        const auth = JWT.sign(
-          { ...result[0], password: null },
-          process.env.APP_KEY,
-          { expiresIn: "1d" }
-        );
-        res.send({
-          success: true,
-          auth
-        });
+  try {
+    mysql.execute(sql, [username], (err, result, field) => {
+      if (result.length > 0) {
+        if (bcrypt.compareSync(password, result[0].password)) {
+          // const auth = JWT.sign({ ...result[0], id: null }, process.env.APP_KEY);
+          const auth = JWT.sign(
+            { ...result[0], password: null },
+            process.env.APP_KEY,
+            { expiresIn: "1d" }
+          );
+          res.send({
+            success: true,
+            auth
+          });
+        } else {
+          res.send({
+            success: false,
+            msg: "user or password incorrect"
+          });
+        }
       } else {
         res.send({
           success: false,
-          msg: "user or password incorrect"
+          msg: "user not found"
         });
       }
-    } else {
-      res.send({
-        success: false,
-        msg: "user not found"
-      });
-    }
-  });
+    });
+  } catch (error) {
+    res.send({ success: false, msg: error });
+  }
 });
 
 router.post("/logout", auth([]), logout);
+
+/* FORGOT PASSWORD */
+router.post('/forgot_password', (req, res) => {
+  var newPassword = ''
+  var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+  for (var i = 0; i < 6; i++) {
+    newPassword += characters.charAt(Math.floor(Math.random() * characters.length))
+  }
+  const { username } = req.body
+
+  try {
+    mysql.execute('SELECT email FROM user WHERE username = ? LIMIT 1', [username], (err, result, field) => {
+      console.log(result)
+      if (result.length === 0) {
+        res.send({
+          succes: false,
+          msg: 'Username not Found'
+        })
+      } else {
+        password_decode = bcrypt.hashSync(newPassword)
+        mysql.execute('UPDATE user SET password = ? WHERE username = ?', [password_decode, username], (err, result2, field) => {
+          return
+        })
+        var transporter = nodemailer.createTransport({
+          service: 'gmail',
+          auth: {
+            user: 'haruman.hijau@gmail.com',
+            pass: 'harumanmenjadihijau'
+          }
+        })
+  
+        var mailOptions = {
+          from: 'haruman.hijau@gmail.com',
+          to: result[0].email,
+          subject: '<Dont Repply Email>',
+          text: 'your new password for username '+ username +' is ' + newPassword + `\n please immediately change after login`
+        };
+  
+        transporter.sendMail(mailOptions, (err, info) => {
+          if (err) throw err;
+          console.log('Email sent: ' + info.response);
+        })
+  
+        res.send({
+          succes: true,
+          msg: 'check your email'
+        })
+      }
+    })
+  } catch (error) {
+    res.send({ success: false, msg: error });
+  }
+
+})
+
 
 module.exports = router;

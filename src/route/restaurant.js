@@ -87,4 +87,14 @@ router.put("/:id", auth(["admin"]), upload.single("image"), (req, res) => {
   }
 });
 
+router.delete("/:id", auth(["admin"]),  (req, res) => {
+  const {id} = req.params
+  try {
+    const sql = `Delete from restaurant WHERE id=?`;
+    mysql.execute(sql,[id],sqlexec(res, mysql));
+  } catch (error) {
+    res.send({ success: false, msg: error });
+  }
+});
+
 module.exports = router;

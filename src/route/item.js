@@ -47,19 +47,19 @@ var upload = multer({ storage: storage, fileFilter });
 //   });
 
 router.get(["", "/search"], (req, res) => {
-  let { page, order, name, price,category, rating, limit, byRestaurant, asc } = req.query;
+  let { page, order, name, price, category, rating, limit, byRestaurant, asc } = req.query;
 
   name = name ? ` item.name LIKE "%${name}%" ` : `item.name LIKE "%%"`;
   price = price ? ` AND item.price= "${price}"` : "";
   rating = rating ? ` AND item.rating=ROUND(${rating},0) ` : "";
   byRestaurant = byRestaurant ? ` AND id_restaurant=${byRestaurant} ` : "";
   order = order ? "item." + order : "restaurant.id";
-  category = parseInt(category)? `AND item.id_category=${category}` : "";
+  category = parseInt(category) ? `AND item.id_category=${category}` : "";
   let where = name || price || rating ? "WHERE" : "";
   page = parseInt(page) || 1;
   limit = parseInt(limit) || 10;
-  asc = asc || "ASC";
-  
+  asc = asc || "DESC";
+
 
   // "SELECT * FROM item WHERE id_restaurant=?";
   const sql = `(SELECT item.id,item.name , item.price, item.image, item.rating, 
@@ -71,8 +71,10 @@ router.get(["", "/search"], (req, res) => {
   union (select count(*),null,null,null,null,null,null,null,null from item 
   ${where} ${name} ${price} ${rating} ${category} ${byRestaurant})`;
 
-  const pagequery = { current_page: page, limit, 
-    link:req.get('host')+req.path, query: req.query }
+  const pagequery = {
+    current_page: page, limit,
+    link: req.get('host') + req.path, query: req.query
+  }
 
   mysql.execute(sql, [], sqlexecData(res, mysql, pagequery));
 });
@@ -96,11 +98,16 @@ router.post("/", auth(["manager"]), upload.single("image"), (req, res) => {
   const sql =
     "INSERT INTO item (name, price, image, id_restaurant, id_category) VALUES (?,?,?,?,?)";
 
-  mysql.execute(
-    sql,
-    [name, price, image, id_restaurant, id_category],
-    sqlexec(res, mysql)
-  );
+  try {
+    mysql.execute(
+      sql,
+      [name, price, image, id_restaurant, id_category],
+      sqlexec(res, mysql)
+    );
+  } catch (error) {
+    res.send({ success: false, msg: error });
+  }
+
 });
 
 router.put(
@@ -115,16 +122,20 @@ router.put(
     const { id } = req.params;
     const { name, price, id_category } = req.body;
     const { id_restaurant } = req.user.id_restaurant ? req.user : req.body;
-    
+
 
     // const sql = "UPDATE item SET name=?, price=?, image=?, id_category=? WHERE id=?";
     const sql = "UPDATE item SET name=?, price=?, image=?, id_category=? WHERE id=? AND id_restaurant=?";
 
-    mysql.execute(
-      sql,
-      [name, price, image, id_category, id, id_restaurant],
-      sqlexec(res, mysql)
-    );
+    try {
+      mysql.execute(sql, [name, price, image, id_category, id, id_restaurant],
+        sqlexec(res, mysql)
+      );
+    } catch (error) {
+      res.send({ success: false, msg: error });
+    }
+
+
     // mysql.execute(sql, [name, price, image,id_category, id, id_restaurant], sqlexec(res, mysql));
   }
 );
