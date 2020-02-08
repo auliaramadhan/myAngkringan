@@ -41,7 +41,7 @@ router.post("/registrasi", (req, res) => {
   const enc_pass = bcrypt.hashSync(password);
   const sql = "INSERT INTO user (username,password,email,roles) VALUES(?,?,?,?)";
 
-  try {    
+  try {
     mysql.execute(sql, [username, enc_pass, email, "customer"], sqlexec(res, mysql));
   } catch (error) {
     res.send({ success: false, msg: error });
@@ -54,15 +54,15 @@ router.post("/createmanager", auth(["admin"]), (req, res) => {
   const sql =
     "INSERT INTO user (username,password,roles,id_restaurant) VALUES(?,?,?,?)";
 
-    try {
-      mysql.execute(
-        sql,
-        [username, enc_pass, "manager", id_restaurant],
-        sqlexec(res, mysql)
-      );
-    } catch (error) {
-      res.send({ success: false, msg: error });
-    }
+  try {
+    mysql.execute(
+      sql,
+      [username, enc_pass, "manager", id_restaurant],
+      sqlexec(res, mysql)
+    );
+  } catch (error) {
+    res.send({ success: false, msg: error });
+  }
 });
 
 router.put("/changeuser/:username", auth([]), (req, res) => {
@@ -145,31 +145,31 @@ router.post('/forgot_password', (req, res) => {
           return
         })
         var transporter = nodemailer.createTransport({
-          service: 'gmail',
           host: 'smtp.gmail.com',
-          port: 465,
-          secure: true, 
+          port: 587,
+          secure: false,
+          requireTLS: true,
           auth: {
             user: 'haruman.hijau@gmail.com',
             pass: 'harumanmenjadihijau'
           }
         })
-  
+
         var mailOptions = {
           from: 'haruman.hijau@gmail.com',
           to: result[0].email,
           subject: '<Dont Repply Email>',
-          text: 'your new password for username '+ username +' is ' + newPassword + `\n please immediately change after login`
+          text: 'your new password for username ' + username + ' is ' + newPassword + `\n please immediately change after login`
         };
-  
+
         transporter.sendMail(mailOptions, (err, info) => {
-          if (err){
+          if (err) {
             res.send({
               succes: false,
               msg: 'error in database'
             })
             throw err
-          }else{
+          } else {
             console.log('Email sent: ' + info.response);
             res.send({
               succes: true,
@@ -177,7 +177,7 @@ router.post('/forgot_password', (req, res) => {
             })
           }
         })
-  
+
       }
     })
   } catch (error) {
