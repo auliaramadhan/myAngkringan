@@ -134,7 +134,6 @@ router.post('/forgot_password', (req, res) => {
 
   try {
     mysql.execute('SELECT email FROM user WHERE username = ? LIMIT 1', [username], (err, result, field) => {
-      console.log(result)
       if (result.length === 0) {
         res.send({
           succes: false,
@@ -147,6 +146,9 @@ router.post('/forgot_password', (req, res) => {
         })
         var transporter = nodemailer.createTransport({
           service: 'gmail',
+          host: 'smtp.gmail.com',
+          port: 465,
+          secure: true, 
           auth: {
             user: 'haruman.hijau@gmail.com',
             pass: 'harumanmenjadihijau'
@@ -161,14 +163,21 @@ router.post('/forgot_password', (req, res) => {
         };
   
         transporter.sendMail(mailOptions, (err, info) => {
-          if (err) throw err;
-          console.log('Email sent: ' + info.response);
+          if (err){
+            res.send({
+              succes: false,
+              msg: 'error in database'
+            })
+            throw err
+          }else{
+            console.log('Email sent: ' + info.response);
+            res.send({
+              succes: true,
+              msg: 'check your email'
+            })
+          }
         })
   
-        res.send({
-          succes: true,
-          msg: 'check your email'
-        })
       }
     })
   } catch (error) {
