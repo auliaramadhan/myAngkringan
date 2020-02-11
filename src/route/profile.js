@@ -58,7 +58,7 @@ router.post("/", auth([]), (req, res) => {
 
 router.put("/", auth([]), (req, res) => {
   const { first_name, last_name, address, phone, city_of_birth } = req.body;
-  const { id_user } = req.user;
+  const { id } = req.user;
   //   const { id } = req.params;
   const sql = `UPDATE  user_profile SET first_name=?, last_name=?, WHERE id_user=? `;
 
@@ -67,11 +67,11 @@ router.put("/", auth([]), (req, res) => {
 
 router.patch("/changeavatar", auth([]),upload.single('image'),(req, res) => {
   const image = dir + req.file.filename;
-  const { id_user } = req.user;
+  const { id } = req.user;
 
   const sql = `UPDATE user_profile SET avatar=? WHERE id_user=? `;
 
-  mysql.execute(sql, [image, id_user], sqlexec(res, mysql));
+  mysql.execute(sql, [image, id], sqlexec(res, mysql));
 });
 
 
