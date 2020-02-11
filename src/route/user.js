@@ -93,7 +93,7 @@ router.post("/login", (req, res) => {
     mysql.execute(sql, [username], (err, result, field) => {
       if (result.length > 0) {
         if (bcrypt.compareSync(password, result[0].password)) {
-          const auth = JWT.sign({ ...result[0], id: null }, process.env.APP_KEY);
+          const auth = JWT.sign({ ...result[0], password: null }, process.env.APP_KEY);
           // const auth = JWT.sign(
           //   { ...result[0], password: null },
           //   process.env.APP_KEY,
