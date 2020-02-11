@@ -1,8 +1,6 @@
 require("dotenv").config();
 const router = require("express").Router();
 const mysql = require("../dbconfig");
-const fs = require("fs");
-const url = require("url");
 const { auth } = require("../middleware/auth");
 const { sqlexec, sqlexecData } = require("../middleware/mysql");
 

@@ -11,6 +11,7 @@ const express = require("express"),
   category = require("./src/route/category"),
   profile = require("./src/route/profile"),
   checkout = require("./src/route/checkout"),
+  api = require('./src/route'),
   multer = require("multer"),
   upload = multer(),
   cart = require("./src/route/cart");
@@ -26,8 +27,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(express.static(__dirname+"/public"));
 
-
-
 app.use("/user", user);
 app.use("/cart", cart);
 app.use("/restaurant", restaurant);
@@ -36,6 +35,9 @@ app.use("/review", review);
 app.use("/category", category);
 app.use("/profile", profile);
 app.use("/checkout",checkout);
+
+app.use('/api', api)
+
 
 app.get("/", (req, res) => {
   res.send("helo");

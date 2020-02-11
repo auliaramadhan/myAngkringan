@@ -43,69 +43,69 @@ REDIS_PORT=your_port
 
 ## End Point
 **1. GET**
-* `/user` (only accessable by admin)
-* `/item`
-* `/item/search?name=ayam&sort=rating&byRestaurant=11&limit=5&page=1`
-* `/item/:id` (Get item by id and show recommendation)
-* `/categories`
-* `/restaurant`
-* `/restaurant/:id` (Get Restaurant by id)
-* `/cart/`
-* `/review/` 
-* `/review/myreview` (get all review based on login user) 
-* `/review/:id_item` (Get all review by id_item)
+* `/api/user` (only accessable by admin)
+* `/api/item`
+* `/api/item/search?name=ayam&sort=rating&byRestaurant=11&limit=5&page=1`
+* `/api/item/:id` (Get item by id and show recommendation)
+* `/api/categories`
+* `/api/restaurant`
+* `/api/restaurant/:id` (Get Restaurant by id)
+* `/api/cart/`
+* `/api/review/` 
+* `/api/review/myreview` (get all review based on login user) 
+* `/api/review/:id_item` (Get all review by id_item)
 
 **2. POST**
-* `/user/registrasi`
+* `/api/user/registrasi`
     * ``` { "username" : "auliaramadhan", "password" : "1234" } ```
 
-* `/user/createmanager`
+* `/api/user/createmanager`
     * ``` { "username" : "auliamanager3","password" : "1234","id_restaurant" : "2" } ```
 
-* `/user/login`
+* `/api/user/login`
     * ``` { "username" : "auliaramadhan", "password" : "1234" } ```
 
-* `/user/logout`
+* `/api/user/logout`
 
-* `/restaurant`
+* `/api/restaurant`
     * ``` { "name" : "kentucky fried chicken","lating" : "-6.5483965,106.9711935","description" : "makanan cepat saji"  "image" :[]} ```
 
-* `/category`
+* `/api/category`
     * ``` { "name" : "makanan" berat',"description" : "makanan" } ```
 
-* `/item`
+* `/api/item`
     * ``` { "name" : "rendang", "price" : "15000", "id_category" : "3", "image" :[image] } ```
 
-* `/review`
+* `/api/review`
     * ``` { "review" : "Kurang" Enak', "rating" : "4", "id_item" : "12"}```
 
-* `/cart`
+* `/api/cart`
     * ``` { "id_item" : "39", "qty" : "2" }```
 
 **3. PUT**
-* `/user/changeroles/:username`
+* `/api/user/changeroles/:username`
     ```{ "id_restaurant" : "11","roles" : "pelanggan" }```
 
-* `/user/changeuser/:username`
+* `/api/user/changeuser/:username`
     ```{ "username" : "auliaramadhan", "password" : "1234" }```
 
-* `/restaurant`
+* `/api/restaurant`
     * ``` { "name" : "kentucky fried chicken","lating" : "-6.5483965,106.9711935","description" : "makanan cepat saji" "image" :[] } ```
 
-* `/category`
+* `/api/category`
     * ``` { "name" : "makanan berat","description" : "makanan" } ```
 
-* `/item`
+* `/api/item`
     * ``` { "name" : "rendang", "price" : "15000", "image" :[image] } ```
 
-* `/review`
+* `/api/review`
     * ``` { "review" : "Kurang Enak", "rating" : "4"}```
 
-* `/cart/changeitemqty`
+* `/api/cart/changeitemqty`
     * ``` {  "qty" : "2" }```
 
 **4. DELETE**
-* `/item/:id` (Delete item by id)
-* `/review/:id` (Delete review by id)
-* `/cart/:id` (Delete cart by id)
-* `/cart/cleanmycart` (Delete all item in cart by user login)
+* `/api/item/:id` (Delete item by id)
+* `/api/review/:id` (Delete review by id)
+* `/api/cart/:id` (Delete cart by id)
+* `/api/cart/cleanmycart` (Delete all item in cart by user login)

@@ -46,16 +46,7 @@ router.post("/", auth(["admin"]), upload.single("image"), (req, res) => {
   const image = dir + req.file.filename;
   let { geolocation, name, lating, description } = req.body;
   lating = lating.split(",");
-
-  // if (geolocation) {
-  //   let data = await fetch(
-  //     `http://us1.locationiq.com/v1/search.php?key=c0d3e3930c0c4b&q=
-  //     ${geolocation.split(" ").join("+")}&format=json`
-  //   ).then(result => result.json()).then(resul => resul[0]);
-  //  
-  //   lating = [data.lon, data.lan]
-  //   nama = data.display_name
-  // }
+  
   try {
     const sql = `INSERT INTO restaurant (name,logo,longitude,latitude,description) VALUES (?,?,?,?,?)`;
     mysql.execute(

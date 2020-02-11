@@ -12,8 +12,9 @@ function sqlexec(res, mysql) {
           res.send({ success:false , data: result});
         }else  res.send({ success:true , data: result});
       }
-    } catch (error) {     
-      return;
+    } catch (error) {   
+      res.status(400)
+      return res.send({ success: false, error}) ;
     }
   };
 }
@@ -28,7 +29,6 @@ function sqlexecData(res, mysql, data_page) {
         return ;
       } else {
         if (!data_page) {
-
           res.send({ success: true, data: result.slice(0,1), showcase:result.slice(1)});
         }else if( result.length>1 ) {
           data_page.total_data = result.pop().id;
@@ -38,8 +38,8 @@ function sqlexecData(res, mysql, data_page) {
         }else  res.send({ success: false, data: []})
       }
     } catch (error) {
-     
-      return;
+      res.status(400)
+      return res.send({ success: false, error}) ;
     }
   };
 }
