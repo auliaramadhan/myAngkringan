@@ -11,7 +11,7 @@ const router = require("express").Router(),
 router.use("/user", user);
 router.use("/cart", cart);
 router.use("/restaurant", restaurant);
-router.use("/item", item);
+// router.use("/item", item);
 router.use("/review", review);
 router.use("/category", category);
 router.use("/profile", profile);

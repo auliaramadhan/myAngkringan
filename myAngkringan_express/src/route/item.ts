@@ -1,13 +1,48 @@
+/**
+ *@swagger
+ * components:
+ *   schemas:
+ *     Book:
+ *       type: object
+ *       required:
+ *         - title
+ *         - author
+ *         - finished
+ *       properties:
+ *         id:
+ *           type: integer
+ *           description: The auto-generated id of the book.
+ *         title:
+ *           type: string
+ *           description: The title of your book.
+ *         author:
+ *           type: string
+ *           description: Who wrote the book?
+ *         finished:
+ *           type: boolean
+ *           description: Have you finished reading it?
+ *         createdAt:
+ *           type: string
+ *           format: date
+ *           description: The date of the record creation.
+ *       example:
+ *          title: The Pragmatic Programmer
+ *          author: Andy Hunt / Dave Thomas
+ *          finished: true
+ */
 require("dotenv").config();
-const router = require("express").Router();
-const mysql = require("../dbconfig");
-const { auth } = require("../middleware/auth");
-const { sqlexec, sqlexecData } = require("../middleware/mysql");
+import { Router, Request, Response, NextFunction } from "express"
+import mysql from "../dbconfig"
+import { auth } from "../middleware/auth"
+import { sqlexec, sqlexecData } from "../middleware/mysql"
+import * as multer from "multer"
+
+
+const router = Router()
 
 const dir = "/images/uploads/item/";
 
-var multer = require("multer");
-var fileFilter = (req, file, callback) => {
+var fileFilter = (req , file, callback) => {
   var ext = file.originalname.split(".").pop();
   if (ext !== "png" && ext !== "jpg" && ext !== "gif" && ext !== "jpeg") {
     return callback("Only images are allowed");
@@ -23,26 +58,7 @@ var storage = multer.diskStorage({
     cb(null, file.fieldname + "-" + Date.now() + ".jpg");
   }
 });
-var upload = multer({ storage: storage, fileFilter });
-
-// router.get("", (req, res) => {
-//   let { page, order,limit } = req.query;
-//
-//   // order = order ? "item." + order :  "restaurant.id" ;
-//   // page = page || 1;
-//   // limit = limit || 10;
-//   res.redirect(url.format({
-//     pathname:'/search'
-//     , query:{...req.query}
-//   }))
-
-//   // const sql = `SELECT item.id,item.name, item.price, item.image, item.rating,
-//   //     item.created_on, item.updated_on, restaurant.name , COUNT(*) AS "total_data"
-//   //   FROM item JOIN restaurant on item.id_restaurant=restaurant.id
-//   //   ORDER BY ${order} LIMIT ${limit} OFFSET ${page*limit-limit} `;
-//   //   /
-//   //   mysql.execute(sql, [], sqlexecData(res, mysql,{page, limit}));
-//   });
+const upload  = multer({ storage: storage, fileFilter });
 
 router.get(["", "/search"], (req, res) => {
   let { page, order, name, price, category, rating, limit, byRestaurant, asc } = req.query;
@@ -52,7 +68,6 @@ router.get(["", "/search"], (req, res) => {
   rating = rating ? ` AND item.rating=ROUND(${rating},0) ` : "";
   byRestaurant = byRestaurant ? ` AND id_restaurant=${byRestaurant} ` : "";
   order = order ? "item." + order : "restaurant.id";
-  category = parseInt(category) ? `AND item.id_category=${category}` : "";
   let where = name || price || rating ? "WHERE" : "";
   page = parseInt(page) || 1;
   limit = parseInt(limit) || 10;
@@ -61,13 +76,12 @@ router.get(["", "/search"], (req, res) => {
 
   // "SELECT * FROM item WHERE id_restaurant=?";
   const sql = `(SELECT item.id,item.name , item.price, item.image, item.rating, 
-    item.created_on, item.updated_on, restaurant.name AS restauran, category.name as category
+    item.created_on, item.updated_on, restaurant.name AS restauran
   FROM item JOIN restaurant on item.id_restaurant=restaurant.id 
-  LEFT OUTER JOIN category on category.id=item.id_category
-  ${where} ${name} ${price} ${rating} ${category} ${byRestaurant}
+  ${where} ${name} ${price} ${rating} ${byRestaurant}
   ORDER BY ${order} ${asc} LIMIT ${limit} OFFSET ${page * limit - limit})
   union (select count(*),null,null,null,null,null,null,null,null from item 
-  ${where} ${name} ${price} ${rating} ${category} ${byRestaurant})`;
+  ${where} ${name} ${price} ${rating} ${byRestaurant})`;
 
   const pagequery = {
     current_page: page, limit,
@@ -77,18 +91,28 @@ router.get(["", "/search"], (req, res) => {
   mysql.execute(sql, [], sqlexecData(res, mysql, pagequery));
 });
 
-router.get("/:id_item", (req, res) => {
+router.get("/:id_item", (req : Request, res : Response) => {
   const { id_item } = req.params;
-  const sql = `SELECT  * FROM item where id_category=(SELECT id_category from item WHERE id=?) 
-  and id_restaurant=(SELECT id_restaurant from item WHERE id=?)
-      order by id=? desc, price desc limit 6`;
+  const sql = `SELECT  * FROM item where WHERE id=?`
+  // `SELECT * FROM item WHERE id_restaurant=?
+  // ORDER BY ${order} LIMIT 10 OFFSET ${page*10-10}`;
+  mysql.execute(sql, [id_item], sqlexecData(res, mysql));
+});
+
+router.get("/recommmended/:id_item", (req : Request, res : Response) => {
+  const { id_item } = req.params;
+  const sql = `SELECT  * FROM item where id<>?
+    id_category=(SELECT id_category from item WHERE id=?) 
+    and id_restaurant=(SELECT id_restaurant from item WHERE id=?)
+      order by desc limit 5`;
+      // order by id=? desc, price desc limit 6`;
   // `SELECT * FROM item WHERE id_restaurant=?
   // ORDER BY ${order} LIMIT 10 OFFSET ${page*10-10}`;
   mysql.execute(sql, [id_item, id_item, id_item], sqlexecData(res, mysql));
 });
 
 // router.post("/additem", auth('manager'), upload.single("image"), (req, res) => {
-router.post("/", auth(["manager"]), upload.single("image"), (req, res) => {
+router.post("/", auth(["manager"]), upload.single("image"), (req : Request, res : Response) => {
   const image = dir + req.file.filename;
   const { id_restaurant } = req.user.id_restaurant ? req.user : req.body;
   const { name, price, id_category } = req.body;
@@ -146,4 +170,4 @@ router.delete("/:id", auth(["manager", "admin"]), (req, res) => {
   mysql.execute(sql, [id, id_restaurant], sqlexec(res, mysql));
 });
 
-module.exports = router;
+export default router 
